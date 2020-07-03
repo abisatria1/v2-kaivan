@@ -17,7 +17,12 @@ app.use(cors())
 
 // router
 const customerRouter = require('./routes/customer')
+const driverRouter = require('./routes/driver')
+const partnerRouter = require('./routes/partner')
+
 app.use('/api/customer',customerRouter)
+app.use('/api/driver', driverRouter)
+app.use('/api/partner', partnerRouter)
 
 app.use('/unauthorized' , (req,res,next) => {
     let err = new Error ('Unauthorized access')

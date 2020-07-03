@@ -1,11 +1,10 @@
 const {response,customError} = require('../helpers/wrapper')
-const {google} = require('googleapis')
 const GoogleContacts = require('google-contacts-api')
 const Secret = require('../models/Secret')
+const axios = require('axios')
 
 // models
 const Customer = require('../models/Customer')
-const axios = require('axios')
 
 const getAllCustomer = async (req,res,next) => {
     const customer = await Customer.findAll({})
