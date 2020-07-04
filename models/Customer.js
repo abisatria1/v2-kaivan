@@ -4,17 +4,18 @@ const db = require('../config/database')
 const Customer = db.define(
     'customer',
     {
+        googleId : {
+            type : Sequelize.STRING
+        },
         nama : {
             type : Sequelize.STRING,
             allowNull : false
         },
         alamat : {
             type : Sequelize.STRING,
-            allowNull : false
         },
         notelp : {
             type : Sequelize.STRING,
-            allowNull : false
         }
     },
     {

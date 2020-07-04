@@ -28,6 +28,10 @@ const Order = db.define(
         },
         tanggalCheck : {
             type : Sequelize.DATE
+        },
+        tanggalOrder : {
+            type : Sequelize.DATE,
+            allowNull : false
         }
     },
     {
