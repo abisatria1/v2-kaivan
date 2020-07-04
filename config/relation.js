@@ -4,6 +4,7 @@ const Driver = require('../models/Driver')
 const Partner = require('../models/Partner')
 const Payment = require('../models/Payment')
 const Secret = require('../models/Secret')
+const GoogleToken = require('../models/GoogleToken')
 
 Customer.hasMany(Order)
 Order.belongsTo(Customer)
