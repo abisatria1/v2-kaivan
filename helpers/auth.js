@@ -1,10 +1,11 @@
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth2').Strategy
+const refresh = require('passport-oauth2-refresh')
 const dotenv = require('dotenv').config()
 const Secret = require('../models/Secret')
 
 
-passport.use(new GoogleStrategy({
+const google = new GoogleStrategy({
     clientID : process.env.GOOGLE_CLIENT_ID,
     clientSecret : process.env.GOOGLE_CLIENT_SECRET,
     callbackURL : 'http://localhost:3001/api/customer/google',
@@ -15,4 +16,7 @@ passport.use(new GoogleStrategy({
     }
     const secret= await Secret.create({accessToken,refreshToken})
     done(null,profile)
-}))
+})
+
+passport.use(google)
+refresh.use(google)
