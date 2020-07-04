@@ -6,7 +6,6 @@ const passportConfig = require('../helpers/auth')
 // controller
 const customerController = require('../controllers/customer')
 const axios = require('axios')
-const customer = require('../controllers/customer')
 
 
 router.route('/')
@@ -18,6 +17,20 @@ router.route('/')
         customerController.createCustomer
     )
 
+router.route('/personal/:customerId')
+    .get(
+        customerController.getSpesificCustomer
+    )
+    .patch (
+        validateBody(schema.createCustomerSchema),
+        customerController.updateCustomer
+    )
+
+router.route('/search/:param')
+    .get(
+        customerController.searchByParam
+    )
+    
 router.route('/googleOauth')
     .get(passport.authenticate('google', {scope : [
         'https://www.googleapis.com/auth/contacts',
@@ -35,6 +48,16 @@ router.route('/google')
 router.route('/get')
     .get(
         customerController.getAllContact
+    )
+
+router.route('/syncContact')
+    .get(
+        customerController.syncContact
+    )
+
+router.route('/saveDatabase')
+    .get(
+        customerController.saveContactToDatabase
     )
 
 
