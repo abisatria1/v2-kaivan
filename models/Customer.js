@@ -7,15 +7,23 @@ const Customer = db.define(
         googleId : {
             type : Sequelize.STRING
         },
+        etag : {
+            type : Sequelize.STRING
+        },
         nama : {
             type : Sequelize.STRING,
-            allowNull : false
+        },
+        namaKantor : {
+            type : Sequelize.STRING
         },
         alamat : {
             type : Sequelize.STRING,
         },
         notelp : {
             type : Sequelize.STRING,
+        },
+        raw : {
+            type : Sequelize.TEXT
         }
     },
     {

@@ -8,7 +8,14 @@ const fs = require('fs')
 const Op = require('sequelize').Op
 
 // contact helper
-const {saveDatabaseFunc,requestToGoogle,createGoogleContact} = require('../helpers/googleContact')
+const {
+    saveDatabaseFunc,
+    requestToGoogle,
+    createGoogleContact,
+    updateGoogleContact,
+    saveSyncContact,
+    deleteGoogleContact
+} = require('../helpers/googleContact')
 
 // models
 const Customer = require('../models/Customer')
@@ -22,28 +29,40 @@ const getAllCustomer = async (req,res,next) => {
 
 const getSpesificCustomer = async (req,res,next) => {
     const customer = await Customer.findByPk(req.params.customerId)
-    if (!customer) return response(res,false,'','Data pelanggan tidak ada',400)
+    if (!customer) return next(customError('Data pelanggan tidak ada',400))
     response(res,true,customer,'Berhasil mendapatkan data pelanggan',200)
 }
 
 const createCustomer = async (req,res,next) => {
-    let secret = await Secret.findByPk(4)
+    let secret = await Secret.findAll({})
+    secret = secret[0]
+    let contact
     try {
-        const contact = await createGoogleContact(req.body,secret)
+        contact = await createGoogleContact(req.body,secret)
+
         req.body.googleId = contact.resourceName
+        req.body.etag = contact.etag
+        req.body.raw = JSON.stringify(contact)
+        req.body.notelp = contact.phoneNumbers[0].canonicalForm
         const customer = await Customer.create(req.body)
-        response(res,true,customer,'Customer berhasil dibuat',201)
+        response(res,true,{customer, googleContact : contact},'Customer berhasil dibuat',201)
     } catch (err) {
-        console.log(err)        
+        console.log("error happen " + err)        
         if (err.response.data.error.status == 'UNAUTHENTICATED') {
             console.log('get data with new token')
-            const hasil2 = refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
+            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
                 if (err) {
                     console.log(err)
                     return err
                 }
                 await secret.update({accessToken})
-                return await createGoogleContact(req.body,{accessToken})
+                contact = await createGoogleContact(req.body,{accessToken})
+                req.body.googleId = contact.resourceName
+                req.body.etag = contact.etag
+                req.body.raw = JSON.stringify(contact)
+                req.body.notelp = contact.phoneNumbers[0].canonicalForm
+                const customer = await Customer.create(req.body)
+                response(res,true,{customer, googleContact : contact},'Customer berhasil dibuat',201)
             })
         }else {
             return next(customError('gagal internal server error',500))
@@ -52,11 +71,73 @@ const createCustomer = async (req,res,next) => {
 }
 
 const updateCustomer = async (req,res,next) => {
-    // harus ada raw metadata dari google
+    const customer = await Customer.findByPk(req.params.customerId)
+    if (!customer) return next(customError('Tidak ada data pelanggan',400))
+    let secret = await Secret.findAll({})
+    secret = secret[0]
+    // update customer contact google
+    let update
+    try {
+        update = await updateGoogleContact(customer,req.body,secret)
+
+        req.body.etag = update.etag
+        req.body.raw = JSON.stringify(update)
+        req.body.notelp = update.phoneNumbers[0].canonicalForm
+        await customer.update(req.body)
+        const result = await Customer.findByPk(customer.id)
+        response(res,true,{result,googleContact : update},'Customer berhasil diupdate',200)
+    } catch (err) {
+        console.log("error happen " + err)        
+        if (err.response.data.error.status == 'UNAUTHENTICATED') {
+            console.log('get data with new token')
+            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
+                if (err) {
+                    console.log(err)
+                    throw err
+                }
+                await secret.update({accessToken})
+                update = await updateGoogleContact(customer,req.body,{accessToken})
+
+                req.body.etag = update.etag
+                req.body.raw = JSON.stringify(update)
+                req.body.notelp = update.phoneNumbers[0].canonicalForm
+                await customer.update(req.body)
+                const result = await Customer.findByPk(customer.id)
+                response(res,true,{result,googleContact : update},'Customer berhasil diupdate',200)
+            })
+        }else {
+            return next(customError('gagal internal server error',500))
+        }
+    }
 }
 
 const deleteCustomer = async (req,res,next) => {
-    // 
+    const customer = await Customer.findByPk(req.params.customerId)
+    if (!customer) return next(customError('Data pelanggan tidak ditemukan',400))
+    await customer.destroy()
+    let secret = await Secret.findAll({})
+    secret = secret[0]
+    try {
+        const delCustomer = await deleteGoogleContact(customer.googleId,secret)
+        if (delCustomer.type == false) throw delCustomer 
+        response(res,true,{},'Pelanggan berhasil dihapus',200)
+    } catch (err) {
+        if (err.response.data.error.status == 'UNAUTHENTICATED') {
+            console.log('delete data with new token')
+            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
+                if (err) {
+                    console.log(err)
+                    return err
+                }
+                await deleteGoogleContact(customer.googleId,secret)
+                await secret.update({accessToken})
+                response(res,true,{},'Pelanggan berhasil dihapus',200)
+            })
+        }else {
+            console.log(err)
+            return next(customError('gagal internal server error',500))
+        }
+    }
 }
 
 /* 
@@ -147,11 +228,13 @@ const syncContact = async (req,res,next) => {
     secret = secret[0]
     if (!googleToken.syncToken) return next(customError('sync token tidak ada',400))
     try {
-        const hasil = await requestToGoogle(undefined,googleToken.syncToken,secret)
+        let hasil = await requestToGoogle(undefined,googleToken.syncToken,secret)
         await googleToken.update({syncToken : hasil.nextSyncToken})
-        response(res,true,hasil,'Berhasil mendapatkan data yang terbaru',200)
-    } catch (err) {
-        console.log(err)        
+
+        let syncDb = {}
+        syncDb = await saveSyncContact(hasil.connections)
+        response(res,true,{syncDb, googleSync : hasil},'Berhasil mensinkronisasikan data',200)
+    } catch (err) {       
         if (err.response.data.error.status == 'UNAUTHENTICATED') {
             console.log('get data with new token')
             refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
@@ -159,12 +242,17 @@ const syncContact = async (req,res,next) => {
                     console.log(err)
                     return err
                 }
-                const hasil2 = await requestToGoogle(undefined,googleToken.syncToken,{accessToken})
+                hasil2 = await requestToGoogle(undefined,googleToken.syncToken,{accessToken})
+                await googleToken.update({syncToken : hasil2.nextSyncToken})
                 await secret.update({accessToken})
-                response(res,true,hasil2,'Berhasil mendapatkan data yang terbaru',200)
+                
+                let syncDb = {}
+                syncDb = await saveSyncContact(hasil2.connections)
+                response(res,true,{syncDb, googleSync : hasil2},'Berhasil mensinkronisasikan data',200)
             })
         }else {
-            return next(customError('gagal',400))
+            console.log(err) 
+            next(customError('error internal system in sync method',500))
         }
     }
 }

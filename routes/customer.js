@@ -25,6 +25,9 @@ router.route('/personal/:customerId')
         validateBody(schema.createCustomerSchema),
         customerController.updateCustomer
     )
+    .delete(
+        customerController.deleteCustomer
+    )
 
 router.route('/search/:param')
     .get(
