@@ -227,6 +227,7 @@ const syncContact = async (req,res,next) => {
     const googleToken = await GoogleToken.findByPk(1)
     let secret  = await Secret.findAll({})
     secret = secret[0]
+    console.log(googleToken)
     if (!googleToken.syncToken) return next(customError('sync token tidak ada',400))
     try {
         let hasil = await requestToGoogle(undefined,googleToken.syncToken,secret)
