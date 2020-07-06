@@ -14,7 +14,8 @@ const {
     createGoogleContact,
     updateGoogleContact,
     saveSyncContact,
-    deleteGoogleContact
+    deleteGoogleContact,
+    createNewArr
 } = require('../helpers/googleContact')
 
 // models
@@ -24,7 +25,7 @@ const getAllCustomer = async (req,res,next) => {
     const customer = await Customer.findAll({
         attributes : {exclude : ['createdAt','updatedAt','deletedAt']}
     })
-    response(res,true,customer,'Semua data pelanggan berhasil di dapatkan',200)
+    response(res,true,{customer,total: customer.length},'Semua data pelanggan berhasil di dapatkan',200)
 }
 
 const getSpesificCustomer = async (req,res,next) => {
@@ -230,11 +231,11 @@ const syncContact = async (req,res,next) => {
     try {
         let hasil = await requestToGoogle(undefined,googleToken.syncToken,secret)
         await googleToken.update({syncToken : hasil.nextSyncToken})
-
         let syncDb = {}
         syncDb = await saveSyncContact(hasil.connections)
         response(res,true,{syncDb, googleSync : hasil},'Berhasil mensinkronisasikan data',200)
-    } catch (err) {       
+    } catch (err) {     
+        console.log(err)  
         if (err.response.data.error.status == 'UNAUTHENTICATED') {
             console.log('get data with new token')
             refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
@@ -261,19 +262,15 @@ const saveContactToDatabase = async (req,res,next) => {
     console.log('get json data')
     let customerDataToDatabase = JSON.parse(fs.readFileSync('dataPhone.json', 'utf8'));
     customerDataToDatabase = customerDataToDatabase.data
-    let index = 1
-    console.log(customerDataToDatabase)
-    for (let i = 0; i < customerDataToDatabase.length; i++) {
-        console.log('inserting....')
-        let connections = customerDataToDatabase[i].connections
-        for (let j = 0; j < connections.length; j++) {
-            let item = connections[j]
-            let hasil = await saveDatabaseFunc(item)            
-            console.log('berhasil masukan database ' + index)
-            index++
-        }
+    let index = 0
+    let hasil = 0
+    const arr = await createNewArr(customerDataToDatabase)
+    for (let i = 0; i < 20; i++) {
+        console.log('inserting..... :     ' + i)
+        await Customer.bulkCreate(arr[i])
+        index++
     }
-    response(res,true,{},`Berhasil memasukan ${index-1} data`,201)
+    response(res,true,{},`Berhasil memasukan data`,201)
 }
 
 
