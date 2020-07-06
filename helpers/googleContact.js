@@ -9,9 +9,11 @@ const Op = require('sequelize').Op
 // models
 const Customer = require('../models/Customer');
 const { hostname } = require('os');
+const { response } = require('express');
 
 const hostName  = 'https://people.googleapis.com'
 const personFields = 'personFields=names,addresses,phoneNumbers,organizations,biographies'
+const sortOrder = 'sortOrder=LAST_MODIFIED_DESCENDING'
 
 const createGoogleContact = async (cust = {notelp : "", nama : "", alamat : "" , namaKantor : ""}, secret) => {
     let custData = {}
@@ -67,7 +69,7 @@ const updateGoogleContact = async (prev = {googleId : "" , etag : ""},cust = {na
     return new Promise(async (resolve,reject) => {
         try {
             const hasil = await axios({
-                url : `${hostName}/v1/${prev.googleId}:updateContact?${personFields}&${updatePersonFields}`,
+                url : `${hostName}/v1/${prev.googleId}:updateContact?${sortOrder}&${personFields}&${updatePersonFields}`,
                 method : 'PATCH',
                 headers : {
                     'Authorization' : 'Bearer ' + secret.accessToken
@@ -118,6 +120,24 @@ const saveDatabaseFunc = async (dataCustomer = {}) => {
     return customer
 }
 
+const createNewArr = async (data = []) => {
+    let resArr = []
+    resArr = data.map(row => {
+        return row.connections.map(item => {
+            let googleId = item.resourceName
+            let etag = item.etag
+            let nama = item.names ? item.names[item.names.length - 1].displayName : null
+            let notelp = item.phoneNumbers ? item.phoneNumbers[0].canonicalForm : null
+            let alamat = item.addresses ? item.addresses[item.addresses.length - 1].formattedValue : null
+            let namaKantor = item.organizations ? item.organizations[0].name : null
+
+            let data = {googleId,etag,nama,notelp,alamat,namaKantor,raw : JSON.stringify(item)}
+            return data
+        })
+    })
+    return resArr
+}
+
 const updateDatabaseFunc = async (custDatabase = {}, dataCustomer = {}) => {
     console.log('update database data function')
     const etag = dataCustomer.etag
@@ -140,7 +160,7 @@ const requestToGoogle = async (pageToken,syncToken,secret) => {
     if (syncToken != undefined) syncparam = `&syncToken=${syncToken}`
     console.log(syncparam,queryparam)
     fixData = await axios({
-        url : `${hostName}/v1/people/me/connections?pageSize=1000&${personFields}&requestSyncToken=true${queryparam}${syncparam}`,
+        url : `${hostName}/v1/people/me/connections?${sortOrder}&pageSize=1000&${personFields}&requestSyncToken=true${queryparam}${syncparam}`,
         method : 'GET',
         headers : {
             'Authorization' : 'Bearer ' + secret.accessToken
@@ -182,6 +202,7 @@ const saveSyncContact = async (arrSync = []) => {
                     reject(error)
                 }
             } catch (err) {
+                console.log(err)
                 reject(err)
             }
         }
@@ -195,5 +216,6 @@ module.exports = {
     deleteGoogleContact,
     saveDatabaseFunc,
     requestToGoogle,
-    saveSyncContact
+    saveSyncContact,
+    createNewArr
 }
