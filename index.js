@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const dotenv = require('dotenv').config()
+const axios = require('axios')
+const path = require('path')
+const hbs = require('express-handlebars')
 // another file
 const {response} = require('./helpers/wrapper.js')
 const cors = require('cors')
@@ -9,6 +12,37 @@ const cors = require('cors')
 // database and relation
 const db = require('./config/database')
 const relation = require('./config/relation')
+
+// 1 hour sync contact
+setInterval(async () => {
+    try {
+        const date = new Date(Date.now())
+        const hasil = await axios({
+            url : `${process.env.BASE_URL}/api/customer/syncContact`,
+            method : 'GET'
+        })
+        const dateExecuted = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
+        const timeExecuted = date.getHours() + ":" + date.getMinutes()
+        console.table({
+            hasil : hasil.data.data.syncDb.message,
+            dateExecuted,
+            timeExecuted
+        })
+    } catch (err) {
+        console.log(err.response)
+    }
+}, 1000 * 60 * 60)
+
+app.engine('hbs', hbs({
+    extname: 'hbs',
+    defaultLayout : 'default',
+    layoutsDir: __dirname + '/views/layouts/',
+    partialsDir : __dirname + '/views/partials/'
+}))
+app.set('view engine', 'hbs')
+app.set('views', path.join(__dirname, 'views'))
+app.use(express.static(path.join(__dirname, '/public')));
+
 
 // middleware
 app.use(bodyParser.urlencoded({extended : false}))
@@ -20,7 +54,8 @@ const customerRouter = require('./routes/customer')
 const driverRouter = require('./routes/driver')
 const partnerRouter = require('./routes/partner')
 const orderRouter = require('./routes/order')
-
+const viewsRouter = require('./routes/views')
+app.use(viewsRouter)
 app.use('/api/customer',customerRouter)
 app.use('/api/driver', driverRouter)
 app.use('/api/partner', partnerRouter)

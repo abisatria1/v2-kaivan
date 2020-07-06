@@ -1,0 +1,15 @@
+/* page title */
+.pageTitle .pageTitleName {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* table */
+
+.mainTable {
+    margin-top: 24px !important;
+}
+
+#orderTable{
+    width: 100% !important;
+}
