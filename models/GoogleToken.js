@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const db = require('../config/database')
 
 const token = db.define(
-    'googleToken',
+    'googletoken',
     {
         syncToken : {
             type : Sequelize.STRING
