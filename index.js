@@ -31,7 +31,7 @@ setInterval(async () => {
     } catch (err) {
         console.log(err.response)
     }
-}, 1000 * 60 * 60)
+}, 1000 * 60 * 15)
 
 app.engine('hbs', hbs({
     extname: 'hbs',
