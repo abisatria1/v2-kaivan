@@ -6,6 +6,7 @@ const fs = require('fs')
 const Op = require('sequelize').Op
 const {google} = require('googleapis')
 
+
 // contact helper
 const {
     getContact,
