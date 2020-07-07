@@ -159,13 +159,13 @@ const syncContact = async (req,res,next) => {
     let result, i = 1, resArr = [], totalPeople = 0
     let nextPageToken, syncToken , nextSyncToken
     while (nextPageToken || i==1) {
-        console.log(`fetcing ${i} with total people = ${totalPeople}`)
         result = await getContact(service, nextPageToken,googleToken.syncToken)
         resArr.push(result)
         nextPageToken = result.nextPageToken ? result.nextPageToken : undefined
         syncToken = result.syncToken ? result.syncToken : undefined
         nextSyncToken = result.nextSyncToken ? result.nextSyncToken : undefined
         if (result.connections) totalPeople += result.connections.length
+        console.log(`fetcing ${i} with total people = ${totalPeople}`)
         i++
     }
     if (syncToken||nextSyncToken) {
