@@ -19,7 +19,7 @@ router.route('/:driverId')
         driverController.getSpesificDriver
     )
     .patch(
-        validateBody(schema.createDriverSchema),
+        validateBody(schema.updateDriverSchema),
         driverController.updateDriver
     )
     .delete(

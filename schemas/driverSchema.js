@@ -8,6 +8,15 @@ const createDriverSchema = Joi.object().keys({
     keterangan : Joi.string().allow('')
 })
 
+const updateDriverSchema = Joi.object().keys({
+    nama : Joi.string().min(3),
+    kodeSopir : Joi.string(),
+    notelp : Joi.string().min(6),
+    alamat : Joi.string().allow(''),
+    keterangan : Joi.string().allow('')
+})
+
 module.exports = {
-    createDriverSchema
+    createDriverSchema,
+    updateDriverSchema
 }

@@ -1,0 +1,51 @@
+/* page title */
+.pageTitle .pageTitleName {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* table */
+
+.mainTable {
+    margin-top: 24px !important;
+}
+
+#sopirTable{
+    width: 100% !important;
+}
+
+td {
+    transition: 0.3s;
+}
+
+.successEdit {
+    animation: successColor 1s ease;
+}
+
+.errEdit {
+    animation: errorColor 1s ease;
+}
+
+@keyframes successColor {
+    0% {
+        background-color: initial;
+    }
+    50% {
+        background-color: #66db81;
+    }
+    100% {
+        background-color: initial;
+    }
+}
+
+@keyframes errorColor {
+    0% {
+        background-color: initial;
+    }
+    50% {
+        background-color: #DC3545;
+    }
+    100% {
+        background-color: initial;
+    } 
+}

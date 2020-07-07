@@ -35,7 +35,9 @@ router.route('/sopir')
     .get((req,res,next) => {
         res.render('sopir', {
             title : 'Sopir',
-            pageCss : ""
+            pageCss : "/css/sopir.css",
+            eventHandler : '/js/eventHandler/sopirEventHandler.js',
+            systemHandler : '/js/systemHandler/sopirSystemHandler.js',
         })
     })
 
