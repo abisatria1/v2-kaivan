@@ -1,5 +1,4 @@
-const refresh = require('passport-oauth2-refresh');
-const GoogleContacts = require('google-contacts-api')
+const refresh = require('passport-oauth2-refresh')
 const GoogleToken = require('../models/GoogleToken')
 const Secret = require('../models/Secret')
 const axios = require('axios')
