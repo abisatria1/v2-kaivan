@@ -1,4 +1,5 @@
 const router = require('express-promise-router')()
+const dotenv = require('dotenv').config()
 
 router.route('/')
     .get((req,res,next) => {
@@ -38,6 +39,7 @@ router.route('/sopir')
             pageCss : "/css/sopir.css",
             eventHandler : '/js/eventHandler/sopirEventHandler.js',
             systemHandler : '/js/systemHandler/sopirSystemHandler.js',
+            base_url : process.env.BASE_URL
         })
     })
 

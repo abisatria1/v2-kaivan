@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:3001'
+const baseUrl = $('#base_url').val()
 
 const loadSopir = async () => {
     return new Promise(async (resolve,reject) => {
