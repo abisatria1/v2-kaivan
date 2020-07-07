@@ -5,7 +5,7 @@ const dotenv = require('dotenv').config()
 const Secret = require('../models/Secret')
 
 
-const google = new GoogleStrategy({
+const googlePassport = new GoogleStrategy({
     clientID : process.env.GOOGLE_CLIENT_ID,
     clientSecret : process.env.GOOGLE_CLIENT_SECRET,
     callbackURL : 'http://localhost:3001/api/customer/google',
@@ -18,5 +18,5 @@ const google = new GoogleStrategy({
     done(null,profile)
 })
 
-passport.use(google)
-refresh.use(google)
+passport.use(googlePassport)
+refresh.use(googlePassport)

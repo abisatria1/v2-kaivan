@@ -1,16 +1,14 @@
 const {response,customError} = require('../helpers/wrapper')
 const refresh = require('passport-oauth2-refresh');
-const GoogleContacts = require('google-contacts-api')
 const GoogleToken = require('../models/GoogleToken')
 const Secret = require('../models/Secret')
-const axios = require('axios')
 const fs = require('fs')
 const Op = require('sequelize').Op
+const {google} = require('googleapis')
 
 // contact helper
 const {
-    saveDatabaseFunc,
-    requestToGoogle,
+    getContact,
     createGoogleContact,
     updateGoogleContact,
     saveSyncContact,
@@ -19,11 +17,12 @@ const {
 } = require('../helpers/googleContact')
 
 // models
-const Customer = require('../models/Customer')
+const Customer = require('../models/Customer');
 
 const getAllCustomer = async (req,res,next) => {
     const customer = await Customer.findAll({
-        attributes : {exclude : ['createdAt','updatedAt','deletedAt']}
+        attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']},
+        limit : 100
     })
     response(res,true,{customer,total: customer.length},'Semua data pelanggan berhasil di dapatkan',200)
 }
@@ -35,110 +34,46 @@ const getSpesificCustomer = async (req,res,next) => {
 }
 
 const createCustomer = async (req,res,next) => {
-    let secret = await Secret.findAll({})
-    secret = secret[0]
+    const {oAuth2Client} = req
+    const service = google.people({version : 'v1' , auth : oAuth2Client})
+    console.log('creating customer')
     let contact
-    try {
-        contact = await createGoogleContact(req.body,secret)
-
-        req.body.googleId = contact.resourceName
-        req.body.etag = contact.etag
-        req.body.raw = JSON.stringify(contact)
-        req.body.notelp = contact.phoneNumbers[0].canonicalForm
-        const customer = await Customer.create(req.body)
-        response(res,true,{customer, googleContact : contact},'Customer berhasil dibuat',201)
-    } catch (err) {
-        console.log("error happen " + err)        
-        if (err.response.data.error.status == 'UNAUTHENTICATED') {
-            console.log('get data with new token')
-            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
-                if (err) {
-                    console.log(err)
-                    return err
-                }
-                await secret.update({accessToken})
-                contact = await createGoogleContact(req.body,{accessToken})
-                req.body.googleId = contact.resourceName
-                req.body.etag = contact.etag
-                req.body.raw = JSON.stringify(contact)
-                req.body.notelp = contact.phoneNumbers[0].canonicalForm
-                const customer = await Customer.create(req.body)
-                response(res,true,{customer, googleContact : contact},'Customer berhasil dibuat',201)
-            })
-        }else {
-            return next(customError('gagal internal server error',500))
-        }
-    }
+    contact = await createGoogleContact(req.body,service)
+    console.log(contact)
+    req.body.googleId = contact.resourceName
+    req.body.etag = contact.etag
+    req.body.raw = JSON.stringify(contact)
+    req.body.notelp = contact.phoneNumbers[0].canonicalForm
+    const customer = await Customer.create(req.body)
+    response(res,true,{customer, googleContact : contact},'Customer berhasil dibuat',201)
+    return console.log('done')
 }
 
 const updateCustomer = async (req,res,next) => {
     const customer = await Customer.findByPk(req.params.customerId)
     if (!customer) return next(customError('Tidak ada data pelanggan',400))
-    let secret = await Secret.findAll({})
-    secret = secret[0]
+    const {oAuth2Client} = req
+    const service = google.people({version : 'v1' , auth : oAuth2Client})
     // update customer contact google
     let update
-    try {
-        update = await updateGoogleContact(customer,req.body,secret)
+    update = await updateGoogleContact(customer,req.body,service)
 
-        req.body.etag = update.etag
-        req.body.raw = JSON.stringify(update)
-        req.body.notelp = update.phoneNumbers[0].canonicalForm
-        await customer.update(req.body)
-        const result = await Customer.findByPk(customer.id)
-        response(res,true,{result,googleContact : update},'Customer berhasil diupdate',200)
-    } catch (err) {
-        console.log("error happen " + err)        
-        if (err.response.data.error.status == 'UNAUTHENTICATED') {
-            console.log('get data with new token')
-            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
-                if (err) {
-                    console.log(err)
-                    throw err
-                }
-                await secret.update({accessToken})
-                update = await updateGoogleContact(customer,req.body,{accessToken})
-
-                req.body.etag = update.etag
-                req.body.raw = JSON.stringify(update)
-                req.body.notelp = update.phoneNumbers[0].canonicalForm
-                await customer.update(req.body)
-                const result = await Customer.findByPk(customer.id)
-                response(res,true,{result,googleContact : update},'Customer berhasil diupdate',200)
-            })
-        }else {
-            return next(customError('gagal internal server error',500))
-        }
-    }
+    req.body.etag = update.etag
+    req.body.raw = JSON.stringify(update)
+    req.body.notelp = update.phoneNumbers[0].canonicalForm
+    await customer.update(req.body)
+    const result = await Customer.findByPk(customer.id)
+    response(res,true,{result,googleContact : update},'Customer berhasil diupdate',200)
 }
 
 const deleteCustomer = async (req,res,next) => {
     const customer = await Customer.findByPk(req.params.customerId)
     if (!customer) return next(customError('Data pelanggan tidak ditemukan',400))
     await customer.destroy()
-    let secret = await Secret.findAll({})
-    secret = secret[0]
-    try {
-        const delCustomer = await deleteGoogleContact(customer.googleId,secret)
-        if (delCustomer.type == false) throw delCustomer 
-        response(res,true,{},'Pelanggan berhasil dihapus',200)
-    } catch (err) {
-        if (err.response.data.error.status == 'UNAUTHENTICATED') {
-            console.log('delete data with new token')
-            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
-                if (err) {
-                    console.log(err)
-                    return err
-                }
-                await deleteGoogleContact(customer.googleId,secret)
-                await secret.update({accessToken})
-                response(res,true,{},'Pelanggan berhasil dihapus',200)
-            })
-        }else {
-            console.log(err)
-            return next(customError('gagal internal server error',500))
-        }
-    }
+    const {oAuth2Client} = req
+    const service = google.people({version : 'v1' , auth : oAuth2Client})
+    const delCustomer = await deleteGoogleContact(customer.googleId,service)
+    response(res,true,{},'Pelanggan berhasil dihapus',200)
 }
 
 /* 
@@ -154,7 +89,6 @@ const searchByParam = async (req,res,next) => {
     if (value == "" || value == null || !value) return next(customError('query "value" dibutuhkan',400))
     switch (param) {
         case "nama":
-            console.log('helo')
             query = {nama : {[Op.like] : `%${value}%`}}
             break
         case "alamat": 
@@ -170,7 +104,8 @@ const searchByParam = async (req,res,next) => {
     if (!query) return next(customError('param tidak valid',400))
     const customer = await Customer.findAll({
         attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
-        where : query
+        where : query,
+        limit : 20  
     })
     response(res,true,customer,'Berhasil mendapatkan data pelanggan',200)
 }
@@ -181,86 +116,75 @@ const successAuth = async (req,res,next) => {
 
 // contact middleware
 const getAllContact = async (req,res,next) => {
-    let secret  =await Secret.findAll({})
-    secret = secret[0]
-    refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
-        if (err) {
-            console.log(err)
-            return err
+    const {oAuth2Client} = req
+    const service = google.people({version : 'v1' , auth : oAuth2Client})
+
+    // fetching all data
+    let result, i = 1, resArr = [], totalPeople = 0
+    let nextPageToken, syncToken , nextSyncToken
+
+    while (nextPageToken || i==1) {
+        result = await getContact(service, nextPageToken)
+        resArr.push(result)
+        nextPageToken = result.nextPageToken ? result.nextPageToken : undefined
+        syncToken = result.syncToken ? result.syncToken : undefined
+        nextSyncToken = result.nextSyncToken ? result.nextSyncToken : undefined
+        if (result.connections) totalPeople += result.connections.length
+        console.log(`fetcing ${i} with total people = ${totalPeople}`)
+        i++
+    }
+    if (syncToken != "" || nextSyncToken != "") {
+        console.log({syncToken,nextSyncToken})
+        // update token
+        const token = nextSyncToken || syncToken
+        console.log(token)
+        // update
+        if (token) {
+            await GoogleToken.update({syncToken : token},{where : {id : 1}})
+            console.log('updated sync token')
         }
-        console.log(accessToken)
-        await secret.update({accessToken})
-        secret = await Secret.findAll({})
-        secret = secret[0]
-        let arrContact = []
-        let syncToken = undefined
-        let googleToken
-        for (let i = 0; i < 20; i++) {
-            if (i==0) pageToken = undefined
-            else pageToken = arrContact[i-1].nextPageToken
-            console.log("pageToken = " + pageToken)
-            console.log("fetching " + i)
-            try {
-                let hasil = await requestToGoogle(pageToken,syncToken,secret)
-                // mendapatkan syncToken
-                if (hasil.syncToken) {
-                    googleToken = await GoogleToken.findByPk(1)
-                    if (!googleToken) await GoogleToken.create({syncToken : hasil.syncToken})
-                    else await googleToken.update({syncToken : hasil.syncToken})
-                }else if (hasil.nextSyncToken) {
-                    googleToken = await GoogleToken.findByPk(1)
-                    if (!googleToken) await GoogleToken.create({syncToken : hasil.nextSyncToken})
-                    else await googleToken.update({syncToken : hasil.nextSyncToken})
-                }
-                arrContact.push(hasil)
-            } catch (error) {
-                console.log('errorr pada request to google')
-                console.log(error)
-            }
-        }
-        console.log('done')
-        response(res,true,arrContact,'berhasil',200)
-    })
+    }
+    console.log('returning all data...')
+    response(res,true,resArr,`berhasil mendapatkan ${totalPeople}`,200)
+    console.log('done')
 }
 
 const syncContact = async (req,res,next) => {
     const googleToken = await GoogleToken.findByPk(1)
-    let secret  = await Secret.findAll({})
-    secret = secret[0]
-    console.log(googleToken)
     if (!googleToken.syncToken) return next(customError('sync token tidak ada',400))
-    try {
-        let hasil = await requestToGoogle(undefined,googleToken.syncToken,secret)
-        console.log('updating google sync token with hasil')
-        await googleToken.update({syncToken : hasil.nextSyncToken})
-        console.log('success updating google sync token with hasil')
-        let syncDb = {}
-        syncDb = await saveSyncContact(hasil.connections)
-        response(res,true,{syncDb, googleSync : hasil},'Berhasil mensinkronisasikan data',200)
-    } catch (err) {     
-        console.log(err)  
-        if (err.response.data.error.status == 'UNAUTHENTICATED') {
-            console.log('get data with new token')
-            refresh.requestNewAccessToken('google', secret.refreshToken, async (err, accessToken, refreshToken) => {
-                if (err) {
-                    console.log(err)
-                    return err
-                }
-                hasil2 = await requestToGoogle(undefined,googleToken.syncToken,{accessToken})
-                console.log('updating google sync token with hasil2 = ' + hasil2.nextSyncToken)
-                await googleToken.update({syncToken : hasil2.nextSyncToken})
-                console.log('success update google sync token with hasil2')
-                await secret.update({accessToken})
-                
-                let syncDb = {}
-                syncDb = await saveSyncContact(hasil2.connections)
-                response(res,true,{syncDb, googleSync : hasil2},'Berhasil mensinkronisasikan data',200)
-            })
-        }else {
-            console.log(err) 
-            next(customError('error internal system in sync method',500))
+    const {oAuth2Client} = req
+    const service = google.people({version : 'v1' , auth : oAuth2Client})
+    // fetching all data
+    let result, i = 1, resArr = [], totalPeople = 0
+    let nextPageToken, syncToken , nextSyncToken
+    while (nextPageToken || i==1) {
+        console.log(`fetcing ${i} with total people = ${totalPeople}`)
+        result = await getContact(service, nextPageToken,googleToken.syncToken)
+        resArr.push(result)
+        nextPageToken = result.nextPageToken ? result.nextPageToken : undefined
+        syncToken = result.syncToken ? result.syncToken : undefined
+        nextSyncToken = result.nextSyncToken ? result.nextSyncToken : undefined
+        if (result.connections) totalPeople += result.connections.length
+        i++
+    }
+    if (syncToken||nextSyncToken) {
+        console.log({syncToken,nextSyncToken})
+        // update token
+        const token = nextSyncToken || syncToken
+        console.log(token)
+        // update
+        if (token) {
+            await GoogleToken.update({syncToken : token},{where : {id : 1}})
+            console.log('updated sync token')
         }
     }
+    // sync with database
+    console.log('syncing with database')
+    let syncDb = {}
+    syncDb = await saveSyncContact(resArr)
+    console.log('returning all data...')
+    response(res,true,{totalPeople,syncDb, googleSync : resArr},'Berhasil mensinkronisasikan data',200)
+    return console.log('done')
 }
 
 const saveContactToDatabase = async (req,res,next) => {
@@ -271,8 +195,8 @@ const saveContactToDatabase = async (req,res,next) => {
     let hasil = 0
     const arr = await createNewArr(customerDataToDatabase)
     for (let i = 0; i < 20; i++) {
-        console.log('inserting..... :     ' + i)
         await Customer.bulkCreate(arr[i])
+        console.log('inserting..... :     ' + i)
         index++
     }
     response(res,true,{},`Berhasil memasukan data`,201)

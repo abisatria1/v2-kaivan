@@ -8,14 +8,33 @@ const Op = require('sequelize').Op
 
 // models
 const Customer = require('../models/Customer');
-const { hostname } = require('os');
-const { response } = require('express');
+const { google } = require('googleapis');
 
 const hostName  = 'https://people.googleapis.com'
 const personFields = 'personFields=names,addresses,phoneNumbers,organizations,biographies'
 const sortOrder = 'sortOrder=LAST_MODIFIED_DESCENDING'
 
-const createGoogleContact = async (cust = {notelp : "", nama : "", alamat : "" , namaKantor : ""}, secret) => {
+const getContact = async (service = google.people() , pageToken = "", syncToken = "") => {
+    return new Promise((resolve,reject) => {
+        service.people.connections.list({
+            resourceName : 'people/me',
+            personFields : 'names,organizations,addresses,phoneNumbers,metadata,biographies,photos,memberships',
+            pageSize : 1000,
+            requestSyncToken : true,
+            sortOrder : 'LAST_MODIFIED_DESCENDING',
+            pageToken,
+            syncToken
+        }, (err,result) => {
+            if (err){
+                console.error('The Api return error ' + err)
+                reject(err)
+            }
+            resolve(result.data)
+        })
+    })
+}
+
+const createGoogleContact = async (cust = {notelp : "", nama : "", alamat : "" , namaKantor : ""}, service = google.people()) => {
     let custData = {}
     if (cust.notelp != "" || cust.notelp || cust.notelp != null) {
         custData.phoneNumbers = [{value : cust.notelp}]
@@ -34,23 +53,18 @@ const createGoogleContact = async (cust = {notelp : "", nama : "", alamat : "" ,
 
     return new Promise(async (resolve,reject) => {
         try {
-            const hasil = await axios({
-                url : `${hostName}/v1/people:createContact?${personFields}&alt=json`,
-                method : 'POST',
-                headers : {
-                    'Authorization' : 'Bearer ' + secret.accessToken
-                },
-                data : custData
+            const people = await service.people.createContact({
+                requestBody : custData
             })
-            resolve(hasil.data)
+            resolve(people.data)
         } catch (err) {
-            console.log(err)
+            console.error('error happening in create api ' + err)
             reject(err)
         }
     })
 }
 
-const updateGoogleContact = async (prev = {googleId : "" , etag : ""},cust = {nama : "",alamat : "",notelp : "",namaKantor : ""}, secret) => {
+const updateGoogleContact = async (prev = {googleId : "" , etag : ""},cust = {nama : "",alamat : "",notelp : "",namaKantor : ""}, service = google.people()) => {
     let custData = {}
     custData.etag = prev.etag
     if (cust.notelp != "" || cust.notelp || cust.notelp != null) {
@@ -65,40 +79,34 @@ const updateGoogleContact = async (prev = {googleId : "" , etag : ""},cust = {na
     if (cust.namaKantor) {
         custData.organizations = [{name : cust.namaKantor}]
     }
-    const updatePersonFields = `updatePersonFields=names,addresses,phoneNumbers,organizations`
     return new Promise(async (resolve,reject) => {
         try {
-            const hasil = await axios({
-                url : `${hostName}/v1/${prev.googleId}:updateContact?${sortOrder}&${personFields}&${updatePersonFields}`,
-                method : 'PATCH',
-                headers : {
-                    'Authorization' : 'Bearer ' + secret.accessToken
-                },
-                data : custData
+            const hasil = await service.people.updateContact({
+                resourceName : prev.googleId,
+                updatePersonFields : "names,addresses,phoneNumbers,organizations",
+                requestBody : custData
             })
             resolve(hasil.data)
         } catch (err) {
-            console.log(err.response.data)
+            console.log('error happening in create api ' + err)
+            console.log(err.response)
             reject(err)
         }
     })
 }
 
-const deleteGoogleContact = async (googleId = "", secret = {}) => {
-    if (googleId == "") return {type : false, message : "google id is empty"}
+const deleteGoogleContact = async (googleId = "", service = google.people()) => {
     return new Promise(async (resolve,reject) => {
+        if (googleId == "") reject ( {type : false, message : "google id is empty"} )
         try {
             console.log('deleting google contact...')
-            await axios({
-                url : `${hostName}/v1/${googleId}:deleteContact`,
-                method : 'DELETE',
-                headers : {
-                    'Authorization' : 'Bearer ' + secret.accessToken
-                }
+            await service.people.deleteContact({
+                resourceName : googleId
             })
             resolve({type : true, message : 'deleted'})
         } catch (err) {
-            console.log(err.response.data)
+            console.log('error happening in create api ' + err)
+            console.log(err.response)
             reject(err)
         }
     })
@@ -177,40 +185,62 @@ const validateTypeSync = async (item) => {
     else return {custDatabase : customer,type : "update"}
 }
 
+/* 
+arrsync = 
+[
+    {connections : []},
+    {connections : []},
+    {connections : []},
+    {connections : []},
+]
+*/
 const saveSyncContact = async (arrSync = []) => {
     return new Promise(async (resolve,reject) => {
         let index = 0
+        let createdData = 0, updatedData = 0,deletedData = 0
         for (let i = 0; i < arrSync.length; i++) {
-            let item = arrSync[i]
-            let {custDatabase,type} = await validateTypeSync(item)
-            try {
-                if (type == "delete") {
-                    index++
-                    console.log(`delete database base on sync data ${i}`)
-                    if (custDatabase) await custDatabase.destroy()
-                    else console.log(`data has been deleted on database : ${i}`)
-                }else if (type == "create") {
-                    index++
-                    console.log(`create new contact with sync data ${i}`)
-                    await saveDatabaseFunc(item)
-                }else if (type =="update") {
-                    index++
-                    console.log(`update database with sync data ${i}`)
-                    await updateDatabaseFunc(custDatabase,item)
-                }else {
-                    const error = new Error('Error type of object, expect "create", "delete" , "update" ')
-                    reject(error)
+            let {connections} = arrSync[i]
+            if (!connections) break
+            for (let i = 0; i < connections.length; i++) {
+                let item = connections[i]
+                let {custDatabase,type} = await validateTypeSync(item)
+                try {
+                    if (type == "delete") {
+                        index++
+                        deletedData++
+                        console.log(`delete database base on sync data ${i}`)
+                        if (custDatabase) await custDatabase.destroy()
+                        else console.log(`data has been deleted on database : ${i}`)
+                    }else if (type == "create") {
+                        index++
+                        createdData++
+                        console.log(`create new contact with sync data ${i}`)
+                        await saveDatabaseFunc(item)
+                    }else if (type =="update") {
+                        index++
+                        updatedData++
+                        console.log(`update database with sync data ${i}`)
+                        await updateDatabaseFunc(custDatabase,item)
+                    }else {
+                        const error = new Error('Error type of object, expect "create", "delete" , "update" ')
+                        reject(error)
+                    }
+                } catch (err) {
+                    console.log(err)
+                    reject(err)
                 }
-            } catch (err) {
-                console.log(err)
-                reject(err)
             }
         }
-        resolve({type : "success", message : `${index} data has been sync with database`})
+        resolve({
+            type : "success", 
+            message : `${index} data has been sync with database`,
+            data : {createdData,updatedData,deletedData}
+        })
     })
 }
 
 module.exports = {
+    getContact,
     updateGoogleContact,
     createGoogleContact,
     deleteGoogleContact,

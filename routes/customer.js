@@ -3,29 +3,35 @@ const {validateBody} = require('../helpers/validator/validateBody')
 const schema = require('../schemas/customerSchema')
 const passport = require('passport')
 const passportConfig = require('../helpers/auth')
+const axios = require('axios')
 // controller
 const customerController = require('../controllers/customer')
-const axios = require('axios')
+const { setGoogleClient } = require('../helpers/googleClient')
 
 
 router.route('/')
     .get(
+        
         customerController.getAllCustomer
     )
     .post(
+        setGoogleClient(),
         validateBody(schema.createCustomerSchema),
         customerController.createCustomer
     )
 
 router.route('/personal/:customerId')
     .get(
+        setGoogleClient(),
         customerController.getSpesificCustomer
     )
     .patch (
+        setGoogleClient(),
         validateBody(schema.createCustomerSchema),
         customerController.updateCustomer
     )
     .delete(
+        setGoogleClient(),
         customerController.deleteCustomer
     )
 
@@ -50,16 +56,19 @@ router.route('/google')
 
 router.route('/get')
     .get(
+        setGoogleClient(),
         customerController.getAllContact
     )
 
 router.route('/syncContact')
     .get(
+        setGoogleClient(),
         customerController.syncContact
     )
 
 router.route('/saveDatabase')
     .get(
+        setGoogleClient(),
         customerController.saveContactToDatabase
     )
 

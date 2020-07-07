@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "run": "node index.js",
-    "start" : "node index.js"
+    "start": "node index.js"
   },
   "author": "abisatria",
   "license": "ISC",
@@ -18,7 +18,7 @@
     "express": "^4.17.1",
     "express-handlebars": "^4.0.5",
     "express-promise-router": "^4.0.1",
-    "google-contacts-api": "^1.0.3",
+    "googleapis": "^52.1.0",
     "hbs": "^4.1.1",
     "joi": "^14.3.1",
     "mysql2": "^2.1.0",
