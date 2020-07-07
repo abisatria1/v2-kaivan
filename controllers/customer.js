@@ -231,7 +231,9 @@ const syncContact = async (req,res,next) => {
     if (!googleToken.syncToken) return next(customError('sync token tidak ada',400))
     try {
         let hasil = await requestToGoogle(undefined,googleToken.syncToken,secret)
+        console.log('updating google sync token with hasil')
         await googleToken.update({syncToken : hasil.nextSyncToken})
+        console.log('success updating google sync token with hasil')
         let syncDb = {}
         syncDb = await saveSyncContact(hasil.connections)
         response(res,true,{syncDb, googleSync : hasil},'Berhasil mensinkronisasikan data',200)
@@ -245,7 +247,9 @@ const syncContact = async (req,res,next) => {
                     return err
                 }
                 hasil2 = await requestToGoogle(undefined,googleToken.syncToken,{accessToken})
+                console.log('updating google sync token with hasil2 = ' + hasil2.nextSyncToken)
                 await googleToken.update({syncToken : hasil2.nextSyncToken})
+                console.log('success update google sync token with hasil2')
                 await secret.update({accessToken})
                 
                 let syncDb = {}
