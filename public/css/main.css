@@ -19,8 +19,8 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup, 
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-	margin: 0 !important;
-	padding: 0;
+	/* margin: 0 !important;
+	padding: 0; */
 	/* border: 0 !important;  */
 	font-size: 100%;
 	font: inherit;
@@ -226,5 +226,17 @@ q:before, q:after {
 		height: initial !important;
 	}
 
-	
+	/* Chrome, Safari, Edge, Opera */
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+		margin: 0;
+	}
+
+	/* Firefox */
+	input[type=number] {
+	-moz-appearance: textfield;
+	}
+
+
 }

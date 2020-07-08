@@ -26,6 +26,28 @@ td {
     animation: errorColor 1s ease;
 }
 
+.modalWrapper {
+    width: 70%;
+    margin : 24px auto !important;
+    min-height: 400px !important;
+}
+
+button img {
+    color: white;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+-moz-appearance: textfield;
+}
+
 @keyframes successColor {
     0% {
         background-color: initial;
