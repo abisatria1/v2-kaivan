@@ -18,7 +18,6 @@ $(document).ready( async () => {
     $(document).on('submit','form',async (e) => {
         createValidation()
         e.preventDefault()
-        console.log(e.target)
         if (e.target.checkValidity() !== false) {
             // creating
             try {
@@ -45,7 +44,7 @@ $(document).ready( async () => {
                 popUpMessage({
                     model : Swal,
                     title : "Gagal",
-                    text : err.data.message,
+                    text : err.data ? err.data.message : err.message,
                     icon : 'error'
                 })
             }
@@ -75,7 +74,7 @@ $(document).ready( async () => {
             if (result.value) {
                 // delete proccess
                 const elem = $(e.target)
-                const data = sopirTable.row($(elem).parent()).data()
+                const data = sopirTable.row($(elem).parents('td')).data()
                 try {
                     const result = await deleteSopir(data.id)
                     popUpMessage({
@@ -88,7 +87,7 @@ $(document).ready( async () => {
                     popUpMessage({
                         model : swalWithBootstrapButtons,
                         title : 'Error!',
-                        text : err.data.message,
+                        text : err.data ? err.data.message : err.message,
                         icon : 'error'
                     })
                 }
@@ -149,7 +148,7 @@ $(document).ready( async () => {
                 // position: 'top-end',
                 icon: 'error',
                 title: 'Data tidak valid',
-                text : err.data.message,
+                text : err.data ? err.data.message : err.message,
                 showConfirmButton: true,
                 timer: 3000
             })
