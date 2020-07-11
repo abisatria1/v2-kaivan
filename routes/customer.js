@@ -46,7 +46,8 @@ router.route('/googleOauth')
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile'
     ], 
-    accessType: 'offline', approvalPrompt: 'force'}))
+    accessType: 'offline', approvalPrompt: 'force',prompt: 'consent',
+    }))
 
 router.route('/google')
     .get(
