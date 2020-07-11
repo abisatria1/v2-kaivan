@@ -4,17 +4,6 @@ const db = require('../config/database')
 const Partner = db.define(
     'partner',
     {
-        nama : {
-            type : Sequelize.STRING,
-            allowNull : false
-        },
-        notelp : {
-            type : Sequelize.STRING,
-            allowNull : false
-        },
-        alamat : {
-            type : Sequelize.STRING
-        },
         norek : {
             type : Sequelize.STRING
         },
