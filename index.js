@@ -22,21 +22,17 @@ setInterval(async () => {
     try {
         const date = new Date(Date.now())
         const hasil = await axios({
-            url : `/api/customer/syncContact`,
+            url : `${process.env.BASE_URL}/api/contact/syncContact`,
             method : 'GET'
         })
         const dateExecuted = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
         const timeExecuted = date.getHours() + ":" + date.getMinutes()
-        logger.info({
-            hasil : hasil.data.data.syncDb.message,
-            dateExecuted,
-            timeExecuted
-        })
+        logger.info(`${hasil.data.data.totalPeople} has been sync with database , ${dateExecuted} - ${timeExecuted}`)
     } catch (err) {
         const error = err.response ? err.response.data : err
         logger.error(error)
     }
-}, 1000 * 60 * 10)
+}, 1000 * 10)
 
 app.engine('hbs', hbs({
     extname: 'hbs',
