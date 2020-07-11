@@ -11,6 +11,7 @@ const setGoogleClient = () => {
         secret = secret[0]
         access_token = secret.accessToken
         refresh_token = secret.refreshToken
+        logger.debug('refreshToken = ' + refresh_token)
         // make google client
         const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET)
         oAuth2Client.setCredentials({refresh_token})
