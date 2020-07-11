@@ -178,19 +178,16 @@ const saveSyncContact = async (arrSync = []) => {
                         index++
                         deletedData.push(item)
                         logger.debug(`delete database base on sync data ${i}`)
-                        if (custDatabase) return
-                        // if (custDatabase) await custDatabase.destroy()
+                        if (custDatabase) await custDatabase.destroy()
                         else logger.debug(`data has been deleted on database : ${i}`)
                     }else if (type == "create") {
                         index++
                         createdData.push(item)
                         logger.debug(`pushing new contact with sync data ${i}`)
-                        // await saveDatabaseFunc(item)
                     }else if (type =="update") {
                         index++
                         updatedData.push(item)
                         logger.debug(`pushing new contact with sync data ${i}`)
-                        // await updateDatabaseFunc(custDatabase,item)
                     }else {
                         const error = new Error('Error type of object, expect "create", "delete" , "update" ')
                         reject(error)
