@@ -1,5 +1,6 @@
 const router = require('express-promise-router')()
 const {validateBody} = require('../helpers/validator/validateBody')
+const {createOrUpdateGoogleContact} = require('../helpers/validator/contactValidator')
 const schema = require('../schemas/driverSchema')
 
 // controller
@@ -11,6 +12,7 @@ router.route('/')
     )
     .post(
         validateBody(schema.createDriverSchema),
+        createOrUpdateGoogleContact(),
         driverController.createDriver
     )
 
@@ -20,6 +22,7 @@ router.route('/:driverId')
     )
     .patch(
         validateBody(schema.updateDriverSchema),
+        createOrUpdateGoogleContact(),
         driverController.updateDriver
     )
     .delete(

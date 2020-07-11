@@ -18,10 +18,11 @@ const relation = require('./config/relation')
 
 // 1 hour sync contact
 setInterval(async () => {
+    logger.info('running scheduled sync')
     try {
         const date = new Date(Date.now())
         const hasil = await axios({
-            url : `${process.env.BASE_URL}/api/customer/syncContact`,
+            url : `/api/customer/syncContact`,
             method : 'GET'
         })
         const dateExecuted = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
@@ -35,7 +36,7 @@ setInterval(async () => {
         const error = err.response ? err.response.data : err
         logger.error(error)
     }
-}, 1000 * 60 * 15)
+}, 1000 * 60 * 10)
 
 app.engine('hbs', hbs({
     extname: 'hbs',

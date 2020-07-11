@@ -1,5 +1,5 @@
 const {response,customError} = require('../helpers/wrapper')
-
+const Op = require('sequelize').Op
 // models
 const Contact = require('../models/Contact')
 const GoogleToken = require('../models/GoogleToken')
@@ -144,8 +144,8 @@ const syncContact = async (req,res,next) => {
     
     let bottom = 0,top = 0,index = 1,totalPeople = 0
     while (top < insertDb.length) {
-        if (insertDb.length < (100*index)) top = insertDb.length
-        else top = (index * 100)
+        if (insertDb.length < (50*index)) top = insertDb.length
+        else top = (index * 50)
         logger.debug('syncing start')
         const insert = insertDb.slice(bottom,top)
         await Contact.bulkCreate(insert, { updateOnDuplicate: ["nama","etag","namaKantor","alamat","notelp","raw"] })
@@ -165,6 +165,34 @@ const syncContact = async (req,res,next) => {
     return logger.info('done')
 }
 
+const searchContact = async (req,res,next) => {
+    const {param} = req.params
+    const {value} = req.query
+    let query
+    if (value == "" || value == null || !value) return next(customError('query "value" dibutuhkan',400))
+    switch (param) {
+        case "nama":
+            query = {nama : {[Op.like] : `%${value}%`}}
+            break
+        case "alamat": 
+            query = {alamat : {[Op.like] : `%${value}%`}}
+            break
+        case "notelp": 
+            query = {notelp : {[Op.like] : `%${value}%`}}
+            break
+        default:
+            break
+    }
+    logger.info(`running search by ${param} : ${value}`)
+    if (!query) return next(customError('param tidak valid',400))
+    const contact = await Contact.findAll({
+        attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
+        where : query,
+        limit : 10  
+    })
+    response(res,true,contact,'Berhasil mendapatkan data pelanggan',200)
+}
+
 module.exports = {
     getAllContactGoogle,
     getAllContact,
@@ -172,5 +200,6 @@ module.exports = {
     getSpesificContact,
     updateContact,
     deleteContact,
-    syncContact
+    syncContact,
+    searchContact
 }

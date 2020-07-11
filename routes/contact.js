@@ -39,5 +39,10 @@ router.route('/syncContact')
         contactController.syncContact
     )
 
+router.route('/search/:param')
+    .get(
+        contactController.searchContact
+    )
+
 
 module.exports = router
