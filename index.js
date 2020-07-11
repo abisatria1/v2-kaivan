@@ -5,6 +5,9 @@ const dotenv = require('dotenv').config()
 const axios = require('axios')
 const path = require('path')
 const hbs = require('express-handlebars')
+const loggerConf = require('./config/logger')
+const {setGoogleClient} = require('./helpers/googleClient')
+
 // another file
 const {response} = require('./helpers/wrapper.js')
 const cors = require('cors')
@@ -23,13 +26,14 @@ setInterval(async () => {
         })
         const dateExecuted = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
         const timeExecuted = date.getHours() + ":" + date.getMinutes()
-        console.table({
+        logger.info({
             hasil : hasil.data.data.syncDb.message,
             dateExecuted,
             timeExecuted
         })
     } catch (err) {
-        console.log(err.response)
+        const error = err.response ? err.response.data : err
+        logger.error(error)
     }
 }, 1000 * 60 * 15)
 
@@ -55,11 +59,13 @@ const driverRouter = require('./routes/driver')
 const partnerRouter = require('./routes/partner')
 const orderRouter = require('./routes/order')
 const viewsRouter = require('./routes/views')
+const contactRouter = require('./routes/contact')
 app.use(viewsRouter)
 app.use('/api/customer',customerRouter)
-app.use('/api/driver', driverRouter)
-app.use('/api/partner', partnerRouter)
-app.use('/api/order', orderRouter)
+app.use('/api/contact',setGoogleClient(),contactRouter)
+app.use('/api/driver', setGoogleClient(),driverRouter)
+app.use('/api/partner',setGoogleClient(), partnerRouter)
+app.use('/api/order', setGoogleClient(),orderRouter)
 
 app.use('/unauthorized' , (req,res,next) => {
     let err = new Error ('Unauthorized access')
@@ -88,6 +94,6 @@ const port = process.env.PORT || 3000
 
 app.listen(port , () => {
     db.sync({force : false})
-    .then(() => console.log(`app is running on port ${port}`))
-    .catch(err => console.log(err.message))
-}) 
+    .then(() => logger.debug(`app is running on port ${port}`))
+    .catch(err => logger.error(err.message))
+})
