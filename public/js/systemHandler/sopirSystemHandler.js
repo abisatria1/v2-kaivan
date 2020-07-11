@@ -61,3 +61,29 @@ const deleteSopir = async (id) => {
         }
     })
 }
+
+const searchContact = async (param= "",value="") => {
+    return new Promise (async (resolve,reject) => {
+        try {
+            const result = await axios({
+                url : `/api/contact/search/${param}?value=${value}`,
+                method : 'GET'
+            })
+            resolve(result.data)
+        } catch (err) {
+            console.log(err.response)
+            reject(err.response)
+        }
+    })
+}
+
+const syncContact = async () => {
+    try {
+        const result = await axios({
+            url : `/api/contact/syncContact`,
+            method : 'GET'
+        })
+    } catch (err) {
+        console.log(err.response)
+    }
+}

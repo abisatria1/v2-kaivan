@@ -48,6 +48,53 @@ input[type=number] {
 -moz-appearance: textfield;
 }
 
+
+/* search */
+.searchResult { 
+    display: none;
+}
+
+.active {
+    display: block !important;
+}
+.form-group {
+    position: relative;
+}
+
+.active .searchItem {
+    box-shadow: 0 -1px 1px 1px rgba(122, 122, 122, 0.301);
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.active .searchItem:hover{
+    background-color: #d4d4d4;
+}
+
+.active .searchItem .desc h5{
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.active .searchItem .desc p{
+    line-height: 15px;
+}
+
+.searchResult.active{
+    box-shadow: 1px 1px 3px 1px rgba(85, 85, 85, 0.267);
+    background-color: white;
+    position: absolute;
+    overflow: auto;
+    height: 300px;
+    /* max-width: 490; */
+    min-width: 100%;
+    z-index: 99;
+    border-radius: 10px;
+}
+
 @keyframes successColor {
     0% {
         background-color: initial;

@@ -13,9 +13,9 @@ const createDriverSchema = Joi.object().keys({
 })
 
 const updateDriverSchema = Joi.object().keys({
-    nama : Joi.string().min(3),
-    kodeSopir : Joi.string(),
-    notelp : Joi.string().min(6),
+    nama : Joi.string().min(3).required(),
+    kodeSopir : Joi.string().required(),
+    notelp : Joi.string().min(6).required(),
     alamat : Joi.string().allow(''),
     keterangan : Joi.string().allow(''),
     google : Joi.object({

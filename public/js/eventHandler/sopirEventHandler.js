@@ -24,7 +24,18 @@ $(document).ready( async () => {
                 const form = $('form')
                 $('#createForm .button').hide()
                 $('#createForm .loading').removeClass('d-none')
-                const data = form.serialize()
+
+                // data
+                const data = {
+                    nama : $('#nama').val(),
+                    notelp : $('#notelp').val(),
+                    alamat : $('#alamat').val(),
+                    kodeSopir : $('#kodeSopir').val(),
+                    keterangan : $('#keterangan').val(),
+                    google : {
+                        googleId : $('#googleId').val(),
+                    }
+                }
                 await createSopir(data)
                 drawTable(sopirTable)
                 $('#createForm .button').show()
@@ -40,6 +51,8 @@ $(document).ready( async () => {
                     text : "Data sopir berhasil ditambahkan"
                 })
                 $(form).removeClass('was-validated')
+                syncContact()
+                $(form).data('search',true)
             } catch (err) {
                 popUpMessage({
                     model : Swal,
@@ -131,8 +144,16 @@ $(document).ready( async () => {
         const cellInfo = sopirTable.cell(elem)[0][0]
         const rowData = sopirTable.row(row).data()
         
-
-        const raw = {}
+        const raw = {
+            nama : rowData.contact.nama == null ? "" : rowData.contact.nama,
+            notelp : rowData.contact.notelp == null ? "": rowData.contact.notelp,
+            alamat : rowData.contact.alamat == null ? "": rowData.contact.alamat,
+            kodeSopir : rowData.kodeSopir,
+            keterangan : rowData.keterangan,
+            google : {
+                googleId : rowData.contact.googleId
+            }
+        }
         raw[colName] = value
 
         try {
@@ -158,18 +179,37 @@ $(document).ready( async () => {
         }
         
         // update data
+        syncContact()
         $(elem).removeClass('hasChange')
     })
-    // $('.editable').prop('disabled',true);
+
+    // searching
+    $('body').on('input', '.searchable', (e) => {
+        const nama = $('#nama').val()
+        const alamat = $('#alamat').val()
+        const notelp =  $('#notelp').val()
+        const formData = $('#createForm').data('search')
+        if (nama === "" && notelp === "" && alamat === "") {
+            $('#createForm').data('search',true)
+        }
+        if (formData == true) {
+            searching(e.target)
+        }
+    })
+
+    $(document).on('click' ,'.searchItem', (e) => {
+        const searchItem = $(e.target).parents('.searchItem').length == 0 ? $(e.target) : $(e.target).parents('.searchItem')
+        chooseSearchItem(searchItem)
+    })
 })
 
 const defineDataTable = () => {
     const sopir = $('#sopirTable').DataTable({
         columns : [
             {'defaultContent'  : ""},
-            {"data" : 'nama'},
-            {"data" : 'notelp'},
-            {"data" : 'alamat'},
+            {"data" : 'contact.nama'},
+            {"data" : 'contact.notelp'},
+            {"data" : 'contact.alamat'},
             {"data" : 'kodeSopir'},
             {"data" : 'keterangan'},
             {
@@ -282,4 +322,59 @@ const popUpMessage = ({
         showConfirmButton,
         timer
     })
+}
+
+const searching = async (elem) => {
+    const searchResult = $(elem).siblings('.searchResult')
+    let param = "", str=""
+    param = $(elem).attr('name')
+    str = $(elem).val()
+    
+    searchResult.empty()
+    if (str.length == 0) {
+        $(searchResult).removeClass('active')
+        searchResult.empty()
+        return
+    }
+    let result = await searchContact(param,str)  
+    result = result.data
+
+    if (result.length !== 0 ) {
+        $(searchResult).addClass('active')
+        result.map(item => {
+            searchResult.append(
+            `
+            <div class="searchItem">
+                <div class="desc">
+                    <input type="hidden" value="${item.googleId}">
+                    <h5 class="searchNama">${item.nama == null ? "" : item.nama}</h5>
+                    <p class="searchAlamat">${item.alamat == null ? "" : item.alamat}</p>
+                    <p class="searchNotelp">${item.notelp == null ? "" : item.notelp}</p>
+                </div>
+            </div>
+            `
+            )
+        })
+    }else {
+        $(searchResult).removeClass('active')
+        searchResult.empty()
+    }   
+}
+
+const chooseSearchItem = (elem) => {
+    const googleId = $(elem).find('input').val()
+    const nama = $(elem).find('.searchNama').text()
+    const alamat = $(elem).find('.searchAlamat').text()
+    const notelp = $(elem).find('.searchNotelp').text()
+    
+    $('#nama').val(nama)
+    $('#alamat').val(alamat)
+    $('#notelp').val(notelp)
+    $('#googleId').val(googleId)
+
+    const searchResult = $('.searchResult.active')
+    $(searchResult).removeClass('active')
+    searchResult.empty()
+
+    $('#createForm').data('search','false')
 }

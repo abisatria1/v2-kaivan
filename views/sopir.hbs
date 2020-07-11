@@ -24,21 +24,35 @@
 
 <div id="modal" class="m-auto" >
     <div class="modalWrapper">
-        <form class="needs-validation" id="createForm" novalidate>
+        <form class="needs-validation" id="createForm" novalidate autocomplete="off" data-search="true">
+            <input type="hidden" id="googleId">
             <div class="form-group">
                 <label for="nama">Nama</label>
-                <input type="text" class="form-control" name="nama" id="nama" minlength="3" required>
+                <input type="text" class="form-control searchable" name="nama" id="nama" minlength="3" required>
                 <div class="invalid-feedback">Nama tidak boleh kosong</div>
+                {{!-- search result --}}
+                <div class="searchResult">
+                    <!-- search result -->
+                    
+                </div>
             </div>
             <div class="form-group">
                 <label for="notelp">Notelp</label>
-                <input type="tel" class="form-control" name="notelp" id="notelp" minlength="6" 
+                <input type="tel" class="form-control searchable" name="notelp" id="notelp" minlength="6" 
                 pattern="^(^\+62\s?|^0)(\d{3,4}-?){2}\d{3,4}$" required>
                 <div class="invalid-feedback"></div>
+                {{!-- search result --}}
+                <div class="searchResult form-group">
+                        <!-- search result -->
+                </div>
             </div>
             <div class="form-group">
                 <label for="alamat">Alamat</label>
-                <input type="text" class="form-control" name="alamat" id="alamat">
+                <input type="text" class="form-control searchable" name="alamat" id="alamat">
+                {{!-- search result --}}
+                <div class="searchResult form-group">
+                        <!-- search result -->
+                </div>
             </div>
             <div class="form-group">
                 <label for="kodeSopir">Kode Sopir</label>
