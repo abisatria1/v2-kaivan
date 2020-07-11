@@ -29,7 +29,13 @@ const contact = db.define(
         }
     },
     {
-        paranoid : true
+        paranoid : true,
+        // hooks : {
+        //     beforeUpdate : (item,options) => {
+        //         logger.debug('running after update hooks')
+        //         console.log(item)
+        //     }
+        // }
     }
 )
 

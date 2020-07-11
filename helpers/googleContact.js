@@ -6,14 +6,15 @@ const fs = require('fs')
 const Op = require('sequelize').Op
 
 // models
-const Customer = require('../models/Customer');
-const { google } = require('googleapis');
+const Customer = require('../models/Customer')
+const Contact = require('../models/Contact')
+const { google } = require('googleapis')
 
 const hostName  = 'https://people.googleapis.com'
 const personFields = 'personFields=names,addresses,phoneNumbers,organizations,biographies'
 const sortOrder = 'sortOrder=LAST_MODIFIED_DESCENDING'
 
-const getContact = async (service = google.people() , pageToken = "", syncToken = "") => {
+const getContact = async ({service = google.people('v1') , pageToken = "", syncToken = ""}) => {
     return new Promise((resolve,reject) => {
         service.people.connections.list({
             resourceName : 'people/me',
@@ -25,7 +26,7 @@ const getContact = async (service = google.people() , pageToken = "", syncToken 
             syncToken
         }, (err,result) => {
             if (err){
-                console.error('The Api return error ' + err)
+                logger.error('The Api return error ' + err)
                 reject(err)
             }
             resolve(result.data)
@@ -33,79 +34,79 @@ const getContact = async (service = google.people() , pageToken = "", syncToken 
     })
 }
 
-const createGoogleContact = async (cust = {notelp : "", nama : "", alamat : "" , namaKantor : ""}, service = google.people()) => {
-    let custData = {}
-    if (cust.notelp != "" || cust.notelp || cust.notelp != null) {
-        custData.phoneNumbers = [{value : cust.notelp}]
+const createGoogleContact = async (contact = {notelp : "", nama : "", alamat : "" , namaKantor : ""}, service = google.people('v1')) => {
+    let contactData = {}
+    if (contact.notelp != "" || contact.notelp || contact.notelp != null) {
+        contactData.phoneNumbers = [{value : contact.notelp}]
     }
-    if (cust.nama != "" || cust.nama || cust.nama != null) {
-        custData.names = [{givenName : cust.nama}]
+    if (contact.nama != "" || contact.nama || contact.nama != null) {
+        contactData.names = [{givenName : contact.nama}]
     }
-    if (cust.alamat != "" || cust.alamat || cust.alamat != null) {
-        custData.addresses = [{streetAddress : cust.alamat}]
+    if (contact.alamat != "" || contact.alamat || contact.alamat != null) {
+        contactData.addresses = [{streetAddress : contact.alamat}]
     }
-    if (cust.namaKantor != "" || cust.namaKantor || cust.namaKantor != null) {
-        custData.organizations = [{name : cust.namaKantor}]
+    if (contact.namaKantor != "" || contact.namaKantor || contact.namaKantor != null) {
+        contactData.organizations = [{name : contact.namaKantor}]
     }
 
-    custData.biographies = [{value : "Created from kaivan app"}]
+    contactData.biographies = [{value : "Created from kaivan app"}]
 
     return new Promise(async (resolve,reject) => {
         try {
             const people = await service.people.createContact({
-                requestBody : custData
+                requestBody : contactData
             })
             resolve(people.data)
         } catch (err) {
-            console.error('error happening in create api ' + err)
+            logger.error('error happening in create api ' + err)
             reject(err)
         }
     })
 }
 
-const updateGoogleContact = async (prev = {googleId : "" , etag : ""},cust = {nama : "",alamat : "",notelp : "",namaKantor : ""}, service = google.people()) => {
-    let custData = {}
-    custData.etag = prev.etag
-    if (cust.notelp != "" || cust.notelp || cust.notelp != null) {
-        custData.phoneNumbers = [{value : cust.notelp}]
+const updateGoogleContact = async (prev = {googleId : "" , etag : ""},contact = {nama : "",alamat : "",notelp : "",namaKantor : ""}, service = google.people('v1')) => {
+    let contactData = {}
+    contactData.etag = prev.etag
+    if (contact.notelp != "" || contact.notelp || contact.notelp != null) {
+        contactData.phoneNumbers = [{value : contact.notelp}]
     }
-    if (cust.nama != "" || cust.nama || cust.nama != null) {
-        custData.names = [{givenName : cust.nama}]
+    if (contact.nama != "" || contact.nama || contact.nama != null) {
+        contactData.names = [{givenName : contact.nama}]
     }
-    if (cust.alamat != "" || cust.alamat || cust.alamat != null) {
-        custData.addresses = [{streetAddress : cust.alamat}]
+    if (contact.alamat != "" || contact.alamat || contact.alamat != null) {
+        contactData.addresses = [{streetAddress : contact.alamat}]
     }
-    if (cust.namaKantor) {
-        custData.organizations = [{name : cust.namaKantor}]
+    if (contact.namaKantor) {
+        contactData.organizations = [{name : contact.namaKantor}]
     }
     return new Promise(async (resolve,reject) => {
         try {
             const hasil = await service.people.updateContact({
                 resourceName : prev.googleId,
                 updatePersonFields : "names,addresses,phoneNumbers,organizations",
-                requestBody : custData
+                requestBody : contactData
             })
             resolve(hasil.data)
         } catch (err) {
-            console.log('error happening in create api ' + err)
-            console.log(err.response)
+            logger.error('error happening in create api ' + err)
+            logger.error(err.response)
             reject(err)
         }
     })
 }
 
-const deleteGoogleContact = async (googleId = "", service = google.people()) => {
+const deleteGoogleContact = async (googleId = "", service = google.people('v1')) => {
     return new Promise(async (resolve,reject) => {
         if (googleId == "") reject ( {type : false, message : "google id is empty"} )
         try {
-            console.log('deleting google contact...')
+            logger.debug('deleting google contact...')
             await service.people.deleteContact({
                 resourceName : googleId
             })
             resolve({type : true, message : 'deleted'})
         } catch (err) {
-            console.log('error happening in create api ' + err)
-            console.log(err.response)
+            logger.error('error happening in create api ' + err)
+            logger.error(err.response)
             reject(err)
         }
     })
@@ -113,7 +114,7 @@ const deleteGoogleContact = async (googleId = "", service = google.people()) => 
 }
 
 const saveDatabaseFunc = async (dataCustomer = {}) => {
-    console.log('saving to database function')
+    logger.debug('saving to database function')
     const googleId = dataCustomer.resourceName
     const etag = dataCustomer.etag
     const nama = dataCustomer.names ? dataCustomer.names[dataCustomer.names.length - 1].displayName : null
@@ -145,43 +146,12 @@ const createNewArr = async (data = []) => {
     return resArr
 }
 
-const updateDatabaseFunc = async (custDatabase = {}, dataCustomer = {}) => {
-    console.log('update database data function')
-    const etag = dataCustomer.etag
-    const nama = dataCustomer.names ? dataCustomer.names[dataCustomer.names.length - 1].displayName : null
-    const notelp = dataCustomer.phoneNumbers ? dataCustomer.phoneNumbers[0].canonicalForm : null
-    const alamat = dataCustomer.addresses ? dataCustomer.addresses[dataCustomer.addresses.length - 1].formattedValue : null
-    const namaKantor = dataCustomer.organizations ? dataCustomer.organizations[0].name : null
-
-    const data = {etag,nama,notelp,alamat,namaKantor,raw : JSON.stringify(dataCustomer)}
-
-    const customer = await custDatabase.update(data)
-    return customer
-}
-
-const requestToGoogle = async (pageToken,syncToken,secret) => {
-    let fixData = {}
-    let queryparam = ''
-    let syncparam = ''
-    if (pageToken != undefined) queryparam = `&pageToken=${pageToken}`
-    if (syncToken != undefined) syncparam = `&syncToken=${syncToken}`
-    console.log(syncparam,queryparam)
-    fixData = await axios({
-        url : `${hostName}/v1/people/me/connections?${sortOrder}&pageSize=1000&${personFields}&requestSyncToken=true${queryparam}${syncparam}`,
-        method : 'GET',
-        headers : {
-            'Authorization' : 'Bearer ' + secret.accessToken
-        },
-    })
-    return fixData.data
-}
-
 const validateTypeSync = async (item) => {
     const {resourceName,names,addresses,phoneNumbers,biographies,organizations} = item
-    const customer = await Customer.findOne({where : {googleId : resourceName}})
-    if (!names && !addresses && !phoneNumbers && !biographies && !organizations) return {custDatabase : customer,type : "delete"}
-    if (!customer) return {type : "create"}
-    else return {custDatabase : customer,type : "update"}
+    const contact = await Contact.findOne({where : {googleId : resourceName}})
+    if (!names && !addresses && !phoneNumbers && !biographies && !organizations) return {custDatabase : contact,type : "delete"}
+    if (!contact) return {type : "create"}
+    else return {custDatabase : contact,type : "update"}
 }
 
 /* 
@@ -196,7 +166,7 @@ arrsync =
 const saveSyncContact = async (arrSync = []) => {
     return new Promise(async (resolve,reject) => {
         let index = 0
-        let createdData = 0, updatedData = 0,deletedData = 0
+        let createdData = [], updatedData = [],deletedData = []
         for (let i = 0; i < arrSync.length; i++) {
             let {connections} = arrSync[i]
             if (!connections) break
@@ -206,26 +176,27 @@ const saveSyncContact = async (arrSync = []) => {
                 try {
                     if (type == "delete") {
                         index++
-                        deletedData++
-                        console.log(`delete database base on sync data ${i}`)
-                        if (custDatabase) await custDatabase.destroy()
-                        else console.log(`data has been deleted on database : ${i}`)
+                        deletedData.push(item)
+                        logger.debug(`delete database base on sync data ${i}`)
+                        if (custDatabase) return
+                        // if (custDatabase) await custDatabase.destroy()
+                        else logger.debug(`data has been deleted on database : ${i}`)
                     }else if (type == "create") {
                         index++
-                        createdData++
-                        console.log(`create new contact with sync data ${i}`)
-                        await saveDatabaseFunc(item)
+                        createdData.push(item)
+                        logger.debug(`pushing new contact with sync data ${i}`)
+                        // await saveDatabaseFunc(item)
                     }else if (type =="update") {
                         index++
-                        updatedData++
-                        console.log(`update database with sync data ${i}`)
-                        await updateDatabaseFunc(custDatabase,item)
+                        updatedData.push(item)
+                        logger.debug(`pushing new contact with sync data ${i}`)
+                        // await updateDatabaseFunc(custDatabase,item)
                     }else {
                         const error = new Error('Error type of object, expect "create", "delete" , "update" ')
                         reject(error)
                     }
                 } catch (err) {
-                    console.log(err)
+                    logger.error(err)
                     reject(err)
                 }
             }
@@ -238,13 +209,29 @@ const saveSyncContact = async (arrSync = []) => {
     })
 }
 
+const createSyncArr = async (data = []) => {
+    let resArr = []
+    resArr = data.map(item => {
+        let googleId = item.resourceName
+        let etag = item.etag
+        let nama = item.names ? item.names[item.names.length - 1].displayName : null
+        let notelp = item.phoneNumbers ? item.phoneNumbers[0].canonicalForm : null
+        let alamat = item.addresses ? item.addresses[item.addresses.length - 1].formattedValue : null
+        let namaKantor = item.organizations ? item.organizations[0].name : null
+
+        let data = {googleId,etag,nama,notelp,alamat,namaKantor,raw : JSON.stringify(item)}
+        return data
+    })
+    return resArr
+}
+
 module.exports = {
     getContact,
     updateGoogleContact,
     createGoogleContact,
     deleteGoogleContact,
     saveDatabaseFunc,
-    requestToGoogle,
     saveSyncContact,
-    createNewArr
+    createNewArr,
+    createSyncArr
 }

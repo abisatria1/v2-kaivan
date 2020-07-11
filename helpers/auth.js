@@ -14,7 +14,9 @@ const googlePassport = new GoogleStrategy({
     for (let i = 0; i < all.length; i++) {
         await all[i].destroy()
     }
-    const secret= await Secret.create({accessToken,refreshToken})
+    logger.debug({accessToken,refreshToken,profile})
+    logger.debug('assigning oauth client')
+    const secret = await Secret.create({accessToken,refreshToken})
     done(null,profile)
 })
 

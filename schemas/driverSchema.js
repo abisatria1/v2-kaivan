@@ -5,7 +5,11 @@ const createDriverSchema = Joi.object().keys({
     kodeSopir : Joi.string().required(),
     notelp : Joi.string().required().min(6),
     alamat : Joi.string().allow(''),
-    keterangan : Joi.string().allow('')
+    keterangan : Joi.string().allow(''),
+    google : Joi.object({
+        googleId : Joi.string().required(),
+        etag : Joi.string().required()
+    })
 })
 
 const updateDriverSchema = Joi.object().keys({

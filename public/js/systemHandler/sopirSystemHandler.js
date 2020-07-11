@@ -4,7 +4,7 @@ const loadSopir = async () => {
     return new Promise(async (resolve,reject) => {
         try {
             const result = await axios({
-                url : `${baseUrl}/api/driver/`,
+                url : `/api/driver/`,
                 method : 'GET',
             })
             resolve(result.data)
@@ -19,7 +19,7 @@ const updateSopir = async (id,data) => {
     return new Promise (async (resolve,reject) => {
         try {
             const result = await axios({
-                url : `${baseUrl}/api/driver/${id}`,
+                url : `/api/driver/${id}`,
                 method : 'PATCH',
                 data : data
             })
@@ -35,7 +35,7 @@ const createSopir = async (data) => {
     return new Promise (async (resolve,reject) => {
         try {
             const result = await axios({
-                url : `${baseUrl}/api/driver/`,
+                url : `/api/driver/`,
                 method : 'POST',
                 data : data
             })
@@ -51,7 +51,7 @@ const deleteSopir = async (id) => {
     return new Promise (async (resolve,reject) => {
         try {
             const result = await axios({
-                url : `${baseUrl}/api/driver/${id}`,
+                url : `/api/driver/${id}`,
                 method : 'DELETE'
             })
             resolve(result.data)

@@ -1,16 +1,25 @@
 const {response,customError} = require('../helpers/wrapper')
-const axios = require('axios')
+
+// google contact helper
+const {} = require('../helpers/googleContact')
 
 // models
-const Customer = require('../models/Customer')
+const Contact = require('../models/Contact')
 const Driver = require('../models/Driver')
 
 const getAllDriver = async (req,res,next) => {
-    const driver = await Driver.findAll({})
+    const driver = await Driver.findAll({
+        include : [{
+            model : Contact,
+            attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+        }]
+    })
     response(res,true,driver,'Data sopir berhasil didapatkan',200)
 }
 
 const createDriver = async (req,res,next) => {
+    // get contact google
+    // save googleId,raw,etag
     const driver = await Driver.create(req.body)
     response(res,true,driver,'Berhasil menambahkan data driver',200)
 }
