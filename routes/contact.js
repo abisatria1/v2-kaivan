@@ -11,10 +11,12 @@ router.route('/google')
         contactController.getAllContactGoogle
     )
 
-router.route('/')
+router.route('/all')
     .get(
         contactController.getAllContact
     )
+
+router.route('/create')
     .post(
         validateBody(schema.createContactSchema),
         contactController.createContact
