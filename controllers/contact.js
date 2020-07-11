@@ -87,6 +87,9 @@ const getSpesificContact = async (req,res,next) => {
     const {contactGoogleId} = req.query
     if (!contactGoogleId) return response(res,false,null,'Google id diperlukan',400)
     let contact = await Contact.findByPk(contactGoogleId)
+    
+    const contact = await Contact.findByPk(contactGoogleId)
+    if (!contact) return response(res,false,null,'Tidak ada kontak dalam database',400)
     // parsing raw
     contact.raw = JSON.parse(contact.raw)
     response(res,true,contact,'Berhasil mendapatkan data',200)
