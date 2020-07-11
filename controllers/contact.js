@@ -143,8 +143,8 @@ const syncContact = async (req,res,next) => {
     
     let bottom = 0,top = 0,index = 1,totalPeople = 0
     while (top < insertDb.length) {
-        if (insertDb.length < (10000*index)) top = insertDb.length
-        else top = (index * 10000)
+        if (insertDb.length < (100*index)) top = insertDb.length
+        else top = (index * 100)
         logger.debug('syncing start')
         const insert = insertDb.slice(bottom,top)
         await Contact.bulkCreate(insert, { updateOnDuplicate: ["nama","etag","namaKantor","alamat","notelp","raw"] })
