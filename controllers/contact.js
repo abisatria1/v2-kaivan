@@ -48,6 +48,41 @@ const fetcingGoogleContact = async (syncTokenParam = "") => {
     return resArr
 }
 
+const syncContactFunc = async () => {
+    const googleToken = await GoogleToken.findByPk(1)
+    const syncToken = googleToken ? googleToken.syncToken : ""
+    const resArr = await fetcingGoogleContact(syncToken)
+
+    let syncDb = {}
+    syncDb = await saveSyncContact(resArr)
+
+    const {createdData,updatedData,deletedData} = syncDb.data
+
+    const insertDb = await createSyncArr([...createdData,...updatedData])
+    
+    let bottom = 0,top = 0,index = 1,totalPeople = 0
+    while (top < insertDb.length) {
+        if (insertDb.length < (50*index)) top = insertDb.length
+        else top = (index * 50)
+        logger.debug('syncing start')
+        const insert = insertDb.slice(bottom,top)
+        await Contact.bulkCreate(insert, { updateOnDuplicate: ["nama","etag","namaKantor","alamat","notelp","raw"] })
+        
+        totalPeople = top
+        logger.debug('syncing ' + totalPeople)
+        bottom = top
+        index++
+    }
+    logger.info('returning all data...')
+    const report = {
+        updatedData : updatedData.length,
+        deletedData : deletedData.length,
+        createdData : createdData.length,
+    }
+    logger.debug(`${totalPeople} has been sync with database`)
+    return logger.info('done')
+}
+
 const getAllContactGoogle = async (req,res,next) => {
     logger.info('running get all google contact data')
     const resArr = await fetcingGoogleContact()
@@ -201,5 +236,6 @@ module.exports = {
     updateContact,
     deleteContact,
     syncContact,
-    searchContact
+    searchContact,
+    syncContactFunc
 }

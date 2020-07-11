@@ -7,31 +7,32 @@ const path = require('path')
 const hbs = require('express-handlebars')
 const loggerConf = require('./config/logger')
 const {setGoogleClient} = require('./helpers/googleClient')
+const {syncContactFunc} = require('./controllers/contact')
 
 // another file
 const {response} = require('./helpers/wrapper.js')
 const cors = require('cors')
-
+const {google} = require('googleapis')
 // database and relation
 const db = require('./config/database')
 const relation = require('./config/relation')
+const Secret = require('./models/Secret')
 
 // 1 hour sync contact
 setInterval(async () => {
+    logger.debug('Setting google client')
+    let secret = await Secret.findAll({})
+    if (!secret.length) return response(res,false,null,"secret is empty,please login first",500)
+    secret = secret[0]
+    const refresh_token = secret.refreshToken
+    // make google client
+    const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET)
+    oAuth2Client.setCredentials({refresh_token})
+    google.options({
+        auth: oAuth2Client
+    })
     logger.info('running scheduled sync')
-    try {
-        const date = new Date(Date.now())
-        const hasil = await axios({
-            url : `${process.env.BASE_URL}/api/contact/syncContact`,
-            method : 'GET'
-        })
-        const dateExecuted = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
-        const timeExecuted = date.getHours() + ":" + date.getMinutes()
-        logger.info(`${hasil.data.data.totalPeople} has been sync with database , ${dateExecuted} - ${timeExecuted}`)
-    } catch (err) {
-        const error = err.response ? err.response.data : err
-        logger.error(error)
-    }
+    syncContactFunc()
 }, 1000 * 10)
 
 app.engine('hbs', hbs({
