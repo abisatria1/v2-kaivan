@@ -139,7 +139,7 @@ const syncContact = async (req,res,next) => {
 
     const {createdData,updatedData,deletedData} = syncDb.data
 
-    const insertDb = await createSyncArr([...createdData,...updatedData,...deletedData])
+    const insertDb = await createSyncArr([...createdData,...updatedData])
     
     let bottom = 0,top = 0,index = 1,totalPeople = 0
     while (top < insertDb.length) {
