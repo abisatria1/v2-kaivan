@@ -28,7 +28,9 @@ router.route('/jasa')
     .get((req,res,next) => {
         res.render('jasa', {
             title : 'Jasa',
-            pageCss : ""
+            pageCss : "/css/jasa.css",
+            eventHandler : '/js/eventHandler/jasaEventHandler.js',
+            systemHandler : '/js/systemHandler/jasaSystemHandler.js',
         })
     })
 

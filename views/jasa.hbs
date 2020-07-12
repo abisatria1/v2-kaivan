@@ -1,3 +1,88 @@
 {{>jasaNavbar}} 
 
-<h2>{{title}}</h2>
+<div class="container-lg ml-auto mr-auto mt-4">
+    <div class="pageTitle">
+        <div class="pageTitleName">{{title}}</div>
+        <div class="orderDate">7 Januari 2020</div>
+    </div>
+    <div class="mainTable table-responsive-md">
+        <table id="jasaTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Nama</th>
+                    <th scope="col">Notelp</th>
+                    <th scope="col">Alamat</th>
+                    <th scope="col">Norek</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Tipe Bayar</th>
+                    <th scope="col">Keterangan</th>
+                    <th scope="col">Button</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div id="modal" class="m-auto" >
+    <div class="modalWrapper">
+        <form class="needs-validation" id="createForm" novalidate autocomplete="off" data-search="true">
+            <input type="hidden" id="googleId">
+            <input type="hidden" id="namaKantor">
+            <div class="form-group">
+                <label for="nama">Nama</label>
+                <input type="text" class="form-control searchable" name="nama" id="nama" minlength="3" required>
+                <div class="invalid-feedback"></div>
+                {{!-- search result --}}
+                <div class="searchResult">
+                    <!-- search result -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notelp">Notelp</label>
+                <input type="tel" class="form-control" name="notelp" id="notelp" minlength="6" 
+                pattern="^(^\+62\s?|^0)(\d{3,4}-?){2}\d{3,4}$" required>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="alamat">Alamat</label>
+                <input type="text" class="form-control" name="alamat" id="alamat">
+            </div>
+            <div class="form-group">
+                <label for="norek">Norek</label>
+                <input type="text" class="form-control" name="norek" id="norek">
+            </div>
+            <div class="form-group">
+                <label for="statusJasa">Status Jasa</label>
+                <select class="custom-select" id="statusJasa" name="statusJasa">
+                    <option selected value="Aktif">--Status Jasa--</option>
+                    <option value="Aktif">Aktif</option>
+                    <option value="Pasif">Pasif</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tipePembayaran">Tipe Pembayaran</label>
+                <select class="custom-select form-control" id="tipePembayaran" name="tipePembayaran" required>
+                    <option selected value="">--Tipe Pembayaran--</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="keterangan">Keterangan</label>
+                <textarea class="form-control" name="keterangan" id="keterangan" cols="10" rows="2"></textarea>
+            </div>
+            <div class="text-right mt-4 button" >
+                <a href=""data-izimodal-close="" class="btn btn-danger">Cancel</a>
+                <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+            <div class="text-center mt-4  d-none loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

@@ -1,13 +1,11 @@
-
-
-$(document).ready( async () => {
-    const sopirTable = defineDataTable()
-    await drawTable(sopirTable)
+$(document).ready(async () => {
+    const jasaTable = defineDataTable()
+    await drawTable(jasaTable)
     const modal = $('#modal').iziModal({
-        title : 'Tambah Data Sopir',
+        title : 'Tambah Data Jasa',
         subtitle : 'Diharapkan mengisi data dengan benar dan bertanggung jawab',
         headerColor : '#CF5300',
-        closeButton : false,
+        closeButton : true,
         width : 700,
         onClosing : () => {
             $('#createForm .form-control').each((i,elem) => {
@@ -19,13 +17,13 @@ $(document).ready( async () => {
     }) 
 
     // create
-    $(document).on('submit','form',async (e) => {
+    $(document).on('submit','#createForm',async (e) => {
         createValidation()
         e.preventDefault()
         if (e.target.checkValidity() !== false) {
             // creating
             try {
-                const form = $('form')
+                const form = $('#createForm')
                 $('#createForm .button').hide()
                 $('#createForm .loading').removeClass('d-none')
 
@@ -34,28 +32,34 @@ $(document).ready( async () => {
                     nama : $('#nama').val(),
                     notelp : $('#notelp').val(),
                     alamat : $('#alamat').val(),
-                    kodeSopir : $('#kodeSopir').val(),
+                    norek : $('#norek').val(),
+                    statusJasa : $('#statusJasa').val(),
+                    tipePembayaran : $('#tipePembayaran').val(),
                     keterangan : $('#keterangan').val(),
                     namaKantor : $('#namaKantor').val(),
                     google : $('#googleId').val() == "" ? undefined : {googleId : $('#googleId').val()}
                 }
-                await createSopir(data)
-                drawTable(sopirTable)
+                // sending data
+                await createJasa(data)
+                drawTable(jasaTable)
+
+                // reset
                 $('#createForm .button').show()
                 $('#createForm .loading').addClass('d-none') 
                 $('#modal').iziModal('close')
-                // reset form
                 $('#createForm .form-control').each((i,elem) => {
                     $(elem).val('') 
                 })
+                $(form).removeClass('was-validated')
+                $(form).data('search',true)
+
+                // callback client
                 popUpMessage({
                     model : Swal,
                     title : "Berhasil",
-                    text : "Data sopir berhasil ditambahkan"
+                    text : "Data Jasa berhasil ditambahkan"
                 })
-                $(form).removeClass('was-validated')
                 syncContact()
-                $(form).data('search',true)
             } catch (err) {
                 popUpMessage({
                     model : Swal,
@@ -69,70 +73,90 @@ $(document).ready( async () => {
         }
     })
 
-    //delete
-    $('table').on('click', '.deleteBtn' , (e) => {
-        e.preventDefault()
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                cancelButton: 'btn btn-danger p-2 w-25',
-                confirmButton: 'btn btn-success p-2 ml-4 w-25'
-            },
-            buttonsStyling: false
-        })
-        
-        swalWithBootstrapButtons.fire({
-            title: 'Apakah and ingin menghapus data ini ?',
-            text: "Data tidak dapat dikembalikan",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'No',
-            reverseButtons: true
-        }).then(async (result) => {
-            if (result.value) {
-                // delete proccess
-                const elem = $(e.target)
-                const data = sopirTable.row($(elem).parents('td')).data()
-                try {
-                    const result = await deleteSopir(data.id)
-                    popUpMessage({
-                        model : swalWithBootstrapButtons,
-                        title : 'Deleted!',
-                        text : 'Data sopir berhasil dihapus.'
-                    })
-                    drawTable(sopirTable)
-                } catch (err) {
-                    popUpMessage({
-                        model : swalWithBootstrapButtons,
-                        title : 'Error!',
-                        text : err.data ? err.data.message : err.message,
-                        icon : 'error'
-                    })
-                }
-            }
-        })
-    })
-    
+    // live editing
     // live editing content
-    $('#sopirTable').on('dblclick', '.editable' , (event) => {
+    $('#jasaTable').on('dblclick', '.editable' , (event) => {
         const elem = event.target
+        const colName = $(elem).data('colName')
         const value = $(elem).text()
         $(elem).data('prevValue',value)
         $(elem).text('')
-        $(elem).append(`<textarea class="form-control" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`)
+        
+        let str = "" , option =""
+        switch (colName) {
+            case "statusJasa":
+                    if (value == "Aktif") {
+                        option = `
+                        <option selected value="Aktif">Aktif</option>
+                        <option value="Pasif">Pasif</option>`
+                    }else {
+                        option = `
+                        <option  value="Aktif">Aktif</option>
+                        <option selected value="Pasif">Pasif</option>`
+                    }
+                    str = `<select class="custom-select">${option}</select>`
+                    break
+                case "tipePembayaran" : 
+                    if (value == "1" || value == 1) {
+                        option = `
+                        <option selected value="1">1</option>
+                        <option value="2">2</option>`
+                    }else {
+                        option = `
+                        <option  value="1">1</option>
+                        <option selected value="2">2</option>`
+                    }
+                    str = `<select class="custom-select">${option}</select>`
+                    break
+            default:
+                str = `<textarea class="form-control" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`
+                break
+        }
+        $(elem).append(str)
         $(elem).find('textarea').focus()
     })
 
-    $('#sopirTable').on('taphold', '.editable' , (event) => {
+    $('#jasaTable').on('taphold', '.editable' , (event) => {
         const elem = event.target
+        const colName = $(elem).data('colName')
         const value = $(elem).text()
         $(elem).data('prevValue',value)
         $(elem).text('')
-        $(elem).append(`<textarea class="form-control" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`)
-        $(elem).find('textarea').focus()
+        
+        let str = "" , option =""
+        switch (colName) {
+            case "statusJasa":
+                    if (value == "Aktif") {
+                        option = `
+                        <option selected value="Aktif">Aktif</option>
+                        <option value="Pasif">Pasif</option>`
+                    }else {
+                        option = `
+                        <option  value="Aktif">Aktif</option>
+                        <option selected value="Pasif">Pasif</option>`
+                    }
+                    str = `<select class="custom-select">${option}</select>`
+                    break
+                case "tipePembayaran" : 
+                    if (value == "1" || value == 1) {
+                        option = `
+                        <option selected value="1">1</option>
+                        <option value="2">2</option>`
+                    }else {
+                        option = `
+                        <option  value="1">1</option>
+                        <option selected value="2">2</option>`
+                    }
+                    str = `<select class="custom-select">${option}</select>`
+                    break
+            default:
+                str = `<textarea class="form-control" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`
+                break
+        }
+        $(elem).append(str)
     })
     
-    $('#sopirTable').on('blur', '.editable' , async (event) => {
+    $('#jasaTable').on('blur', '.editable' , async (event) => {
         const textarea = event.target //textarea
         const elem = $(textarea).parent()
 
@@ -146,15 +170,17 @@ $(document).ready( async () => {
         const colName = $(elem).data('colName')
         const row = $(elem).parent()    
 
-        const cellInfo = sopirTable.cell(elem)[0][0]
-        const rowData = sopirTable.row(row).data()
+        const cellInfo = jasaTable.cell(elem)[0][0]
+        const rowData = jasaTable.row(row).data()
         
         const raw = {
             nama : rowData.contact.nama == null ? "" : rowData.contact.nama,
             notelp : rowData.contact.notelp == null ? "": rowData.contact.notelp,
             alamat : rowData.contact.alamat == null ? "": rowData.contact.alamat,
             namaKantor : rowData.contact.namaKantor == null ? "" : rowData.contact.namaKantor,
-            kodeSopir : rowData.kodeSopir,
+            norek : rowData.norek == null ? "" : rowData.norek,
+            statusJasa : rowData.statusJasa == null ? "" : rowData.statusJasa,
+            tipePembayaran : rowData.tipePembayaran == null ? "" : rowData.tipePembayaran,
             keterangan : rowData.keterangan,
             google : {
                 googleId : rowData.contact.googleId
@@ -163,16 +189,15 @@ $(document).ready( async () => {
         raw[colName] = value
 
         try {
-            await updateSopir(rowData.id,raw)
-            await drawTable(sopirTable)
+            await updateJasa(rowData.id,raw)
+            await drawTable(jasaTable)
             popUpMessage({
                 title : 'Perubahan berhasil disimpan'
             })
             $(textarea).remove()
-            addAfterEditAnimations(cellInfo,sopirTable,true)
+            addAfterEditAnimations(cellInfo,jasaTable,true)
         } catch (err) {
             Swal.fire({
-                // position: 'top-end',
                 icon: 'error',
                 title: 'Data tidak valid',
                 text : err.data ? err.data.message : err.message,
@@ -180,7 +205,7 @@ $(document).ready( async () => {
                 timer: 3000
             })
             
-            addAfterEditAnimations(cellInfo,sopirTable,false)
+            addAfterEditAnimations(cellInfo,jasaTable,false)
             $(elem).text(prevValue)
         }
         
@@ -223,28 +248,74 @@ $(document).ready( async () => {
             $('#namaKantor').val('')
         }
     })
+
+     //delete
+    $('table').on('click', '.deleteBtn' , (e) => {
+        e.preventDefault()
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                cancelButton: 'btn btn-danger p-2 w-25',
+                confirmButton: 'btn btn-success p-2 ml-4 w-25'
+            },
+            buttonsStyling: false
+        })
+        
+        swalWithBootstrapButtons.fire({
+            title: 'Apakah and ingin menghapus data ini ?',
+            text: "Data tidak dapat dikembalikan",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then(async (result) => {
+            if (result.value) {
+                // delete proccess
+                const elem = $(e.target)
+                const data = jasaTable.row($(elem).parents('td')).data()
+                try {
+                    const result = await deleteJasa(data.id)
+                    popUpMessage({
+                        model : swalWithBootstrapButtons,
+                        title : 'Deleted!',
+                        text : 'Data Jasa berhasil dihapus.'
+                    })
+                    drawTable(jasaTable)
+                } catch (err) {
+                    popUpMessage({
+                        model : swalWithBootstrapButtons,
+                        title : 'Error!',
+                        text : err.data ? err.data.message : err.message,
+                        icon : 'error'
+                    })
+                }
+            }
+        })
+    })
 })
 
 const defineDataTable = () => {
-    const sopir = $('#sopirTable').DataTable({
+    const jasa = $('#jasaTable').DataTable({
         columns : [
             {'defaultContent'  : ""},
             {"data" : 'contact.nama'},
             {"data" : 'contact.notelp'},
             {"data" : 'contact.alamat'},
-            {"data" : 'kodeSopir'},
+            {"data" : 'norek'},
+            {"data" : 'statusJasa'},
+            {"data" : 'tipePembayaran'},
             {"data" : 'keterangan'},
             {
                 "defaultContent" : 
                 `
                 <button class="btn btn-danger deleteBtn"><img src="/images/trash.svg" alt="delete"></button>
-                <button class="btn btn-info viewBtn"><img src="/images/eye.svg" alt="delete"></button>
+                <button class="btn btn-info viewBtn"><img src="/images/eye.svg" alt="view"></button>
                 `
             }
         ],
         columnDefs: [
             {
-                'targets': [1,2,3,4,5],
+                'targets': [1,2,3,4,5,6,7],
                 'createdCell':  function (td, cellData, rowData, row, col) {
                     switch (col) {
                         case 1:
@@ -257,9 +328,15 @@ const defineDataTable = () => {
                             $(td).data('colName', 'alamat')
                             break
                         case 4:
-                            $(td).data('colName', 'kodeSopir')
+                            $(td).data('colName', 'norek')
                             break
                         case 5:
+                            $(td).data('colName', 'statusJasa')
+                            break
+                        case 6:
+                            $(td).data('colName', 'tipePembayaran')
+                            break
+                        case 7:
                             $(td).data('colName', 'keterangan')
                             break
                         default:
@@ -271,35 +348,19 @@ const defineDataTable = () => {
         ]
     })
     // tambah nomer
-    sopir.on( 'order.dt search.dt', function () {
-        sopir.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+    jasa.on( 'order.dt search.dt', function () {
+        jasa.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
             cell.innerHTML = i+1;
         } );
     } ).draw()
-    return sopir
+    return jasa
 }
 
 const drawTable = async (table) => {
-    const driverJson = await loadSopir()
+    const partnerJson = await loadJasa()
     table.clear()
-    table.rows.add(driverJson.data)
+    table.rows.add(partnerJson.data)
     table.draw()
-}
-
-const addAfterEditAnimations = async ({row,column} , sopirTable, type) => {
-    const cell = sopirTable.cell(row,column).nodes()
-    console.log(cell)
-    if (type==true) {
-        $(cell).addClass('successEdit')
-        setTimeout(() => {
-            $(cell).removeClass('successEdit')
-        }, 1000)
-    } else {
-        $(cell).addClass('errEdit')
-        setTimeout(() => {
-            $(cell).removeClass('errEdit')
-        }, 1000)
-    }
 }
 
 const createValidation = () => {
@@ -307,14 +368,14 @@ const createValidation = () => {
     // Loop over them and prevent submission
     Array.prototype.filter.call(forms, (form) => {
         $('.form-control').each((i,elem) => {
-            $(elem).next().text("")
-            $(elem).next().text(elem.validationMessage)
+            $(elem).siblings('.invalid-feedback').text("")
+            $(elem).siblings('.invalid-feedback').text(elem.validationMessage)
         })
         $(form).on('input', '.form-control' , (e) => {
             const elem = e.target
             if (elem.checkValidity() == false) {
-                $(elem).next().text("")
-                $(elem).next().text(elem.validationMessage)
+                $(elem).siblings('.invalid-feedback').text("")
+                $(elem).siblings('.invalid-feedback').text(elem.validationMessage)
             }
         })
         if (form.checkValidity() === false) {
@@ -401,4 +462,19 @@ const chooseSearchItem = (elem) => {
     searchResult.empty()
 
     $('#createForm').data('search','false')
+}
+
+const addAfterEditAnimations = async ({row,column} , table, type) => {
+    const cell = table.cell(row,column).nodes()
+    if (type==true) {
+        $(cell).addClass('successEdit')
+        setTimeout(() => {
+            $(cell).removeClass('successEdit')
+        }, 1000)
+    } else {
+        $(cell).addClass('errEdit')
+        setTimeout(() => {
+            $(cell).removeClass('errEdit')
+        }, 1000)
+    }
 }

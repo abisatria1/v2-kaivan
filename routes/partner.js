@@ -1,5 +1,6 @@
 const router = require('express-promise-router')()
 const {validateBody} = require('../helpers/validator/validateBody')
+const {createOrUpdateGoogleContact} = require('../helpers/validator/contactValidator')
 const schema = require('../schemas/partnerSchema')
 
 // controller
@@ -11,6 +12,7 @@ router.route('/')
     )
     .post(
         validateBody(schema.createPartnerSchema),
+        createOrUpdateGoogleContact(),
         partnerController.createPartner
     )
 
@@ -20,6 +22,7 @@ router.route('/:partnerId')
     )
     .patch(
         validateBody(schema.createPartnerSchema),
+        createOrUpdateGoogleContact(),
         partnerController.updatePartner
     )
     .delete(
