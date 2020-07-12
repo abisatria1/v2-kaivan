@@ -21,21 +21,20 @@ const Secret = require('./models/Secret')
 
 
 cron.schedule('*/2 * * * *', async () => {
-    logger.debug('Setting google client')
-    let secret = await Secret.findAll({})
-    if (!secret.length) return response(res,false,null,"secret is empty,please login first",500)
-    secret = secret[0]
-    const refresh_token = secret.refreshToken
-    // make google client
-    const oAuth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET)
-    oAuth2Client.setCredentials({refresh_token})
-    google.options({
-        auth: oAuth2Client
-    })
-    logger.info('google client has been set')
-    logger.info('running scheduled sync')
-    syncContactFunc()
-    logger.info('success run schedule sync')
+    try {
+        logger.info('running schedule sync')
+        const result = await axios({
+            method : 'get',
+            url : 'kaivan.abisatria.my.id/api/contact/SyncContact'
+        })
+        const data = result.data.data
+        logger.debug(`${data.totalPeople} data berhasil di sinkronisasi`)
+        logger.info('success running schedule sync ')
+    } catch (err) {
+        const error = err.respose ? err.response.message : err.message
+        logger.error(error)
+        logger.error('failed running schedule sync')
+    }
 })
 
 app.engine('hbs', hbs({
