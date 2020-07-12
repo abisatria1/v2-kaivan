@@ -25,12 +25,13 @@ cron.schedule('*/2 * * * *', async () => {
         logger.info('running schedule sync')
         const result = await axios({
             method : 'get',
-            url : 'kaivan.abisatria.my.id/api/contact/SyncContact'
+            url : 'https://kaivan.abisatria.my.id./api/contact/SyncContact'
         })
         const data = result.data.data
         logger.debug(`${data.totalPeople} data berhasil di sinkronisasi`)
         logger.info('success running schedule sync ')
     } catch (err) {
+        console.log(err)
         const error = err.respose ? err.response.message : err.message
         logger.error(error)
         logger.error('failed running schedule sync')
