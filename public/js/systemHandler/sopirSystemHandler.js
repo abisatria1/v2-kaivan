@@ -62,11 +62,11 @@ const deleteSopir = async (id) => {
     })
 }
 
-const searchContact = async (param= "",value="") => {
+const searchContact = async (value="") => {
     return new Promise (async (resolve,reject) => {
         try {
             const result = await axios({
-                url : `/api/contact/search/${param}?value=${value}`,
+                url : `/api/contact/search?value=${value}`,
                 method : 'GET'
             })
             resolve(result.data)

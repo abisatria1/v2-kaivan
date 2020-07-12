@@ -1,7 +1,7 @@
 const Joi = require('joi')
 
 const createPartnerSchema = Joi.object().keys({
-    nama : Joi.string().required().min(3),
+    nama : Joi.string().required(),
     notelp : Joi.string().required().min(6),
     alamat : Joi.string().allow(''),
     norek : Joi.string().allow(''),

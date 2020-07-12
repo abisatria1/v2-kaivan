@@ -54,7 +54,7 @@ q:before, q:after {
 	border-spacing: 0;
 } */
 
-.row, .col-md-10, .col-md-2 {
+.row, .col-lg-10, .col-lg-2 {
 	padding: 0 !important;
 	margin: 0 !important;
 }
@@ -152,7 +152,7 @@ q:before, q:after {
 
 /* responsive */
 
-@media (max-width: 768px) { 
+@media (max-width: 992px) { 
 	body {
 		width: 100vw !important;
 	}
@@ -166,7 +166,6 @@ q:before, q:after {
 		margin: 0 !important;
 		background-color: white !important;
 		box-shadow: 0 -1px 1px 1px #b8b8b869;
-
 	}
 
 	.logo {
@@ -223,7 +222,7 @@ q:before, q:after {
 	}
 
 	.navbar {
-		height: initial !important;
+		height: auto !important;
 	}
 
 	/* Chrome, Safari, Edge, Opera */

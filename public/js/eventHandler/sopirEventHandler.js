@@ -32,9 +32,8 @@ $(document).ready( async () => {
                     alamat : $('#alamat').val(),
                     kodeSopir : $('#kodeSopir').val(),
                     keterangan : $('#keterangan').val(),
-                    google : {
-                        googleId : $('#googleId').val(),
-                    }
+                    namaKantor : $('#namaKantor').val(),
+                    google : $('#googleId').val() == "" ? undefined : {googleId : $('#googleId').val()}
                 }
                 await createSopir(data)
                 drawTable(sopirTable)
@@ -148,6 +147,7 @@ $(document).ready( async () => {
             nama : rowData.contact.nama == null ? "" : rowData.contact.nama,
             notelp : rowData.contact.notelp == null ? "": rowData.contact.notelp,
             alamat : rowData.contact.alamat == null ? "": rowData.contact.alamat,
+            namaKantor : rowData.contact.namaKantor == null ? "" : rowData.contact.namaKantor,
             kodeSopir : rowData.kodeSopir,
             keterangan : rowData.keterangan,
             google : {
@@ -191,6 +191,8 @@ $(document).ready( async () => {
         const formData = $('#createForm').data('search')
         if (nama === "" && notelp === "" && alamat === "") {
             $('#createForm').data('search',true)
+            $('#googleId').val('')
+            $('#namaKantor').val('')
         }
         if (formData == true) {
             searching(e.target)
@@ -203,21 +205,11 @@ $(document).ready( async () => {
         chooseSearchItem(searchItem)
     })
 
-    // $(document).on('focusout', '.searchable', (e) => {
-    //     console.log('blur')
-    //     const nama = $('#nama').val()
-    //     const alamat = $('#alamat').val()
-    //     const notelp =  $('#notelp').val()
-    //     const formData = $('#createForm').data('search')
-    //     if (nama === "" && notelp === "" && alamat === "") {
-    //         $('#createForm').data('search',true)
-    //     }else {
-    //         $('#createForm').data('search',false)
-    //     }
-    //     const searchResult = $(e.target).siblings('.searchResult')
-    //     $(searchResult).removeClass('active')
-    //     searchResult.empty()
-    // })
+    $(document).on('focus', '#createForm input' ,(e) => {
+        if ($(e.target).attr('class') != '.searchable') {
+            $('.searchResult').removeClass('active')
+        }
+    })
 })
 
 const defineDataTable = () => {
@@ -343,8 +335,7 @@ const popUpMessage = ({
 
 const searching = async (elem) => {
     const searchResult = $(elem).siblings('.searchResult')
-    let param = "", str=""
-    param = $(elem).attr('name')
+    let str=""
     str = $(elem).val()
     
     searchResult.empty()
@@ -353,7 +344,7 @@ const searching = async (elem) => {
         searchResult.empty()
         return
     }
-    let result = await searchContact(param,str)  
+    let result = await searchContact(str)  
     result = result.data
 
     if (result.length !== 0 ) {
@@ -365,6 +356,7 @@ const searching = async (elem) => {
                 <div class="desc">
                     <input type="hidden" value="${item.googleId}">
                     <h5 class="searchNama">${item.nama == null ? "" : item.nama}</h5>
+                    <p class="searchNamaKantor">${item.namaKantor == null ? "" : item.namaKantor}</p>
                     <p class="searchAlamat">${item.alamat == null ? "" : item.alamat}</p>
                     <p class="searchNotelp">${item.notelp == null ? "" : item.notelp}</p>
                 </div>
@@ -383,11 +375,13 @@ const chooseSearchItem = (elem) => {
     const nama = $(elem).find('.searchNama').text()
     const alamat = $(elem).find('.searchAlamat').text()
     const notelp = $(elem).find('.searchNotelp').text()
+    const namaKantor = $(elem).find('.searchNamaKantor').text()
     
     $('#nama').val(nama)
     $('#alamat').val(alamat)
     $('#notelp').val(notelp)
     $('#googleId').val(googleId)
+    $('#namaKantor').val(namaKantor)
 
     const searchResult = $('.searchResult.active')
     $(searchResult).removeClass('active')

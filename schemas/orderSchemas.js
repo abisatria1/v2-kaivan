@@ -2,7 +2,7 @@ const Joi = require('joi')
 
 const addOrderSchema = Joi.object().keys({
     customer : Joi.object({
-        nama : Joi.string().min(3).required(),
+        nama : Joi.string().required(),
         alamat : Joi.string().required(),
         notelp : Joi.string().required().min(6),
         googleId : Joi.string().allow(''),
