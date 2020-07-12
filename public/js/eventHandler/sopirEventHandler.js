@@ -198,9 +198,26 @@ $(document).ready( async () => {
     })
 
     $(document).on('click' ,'.searchItem', (e) => {
+        console.log('click')
         const searchItem = $(e.target).parents('.searchItem').length == 0 ? $(e.target) : $(e.target).parents('.searchItem')
         chooseSearchItem(searchItem)
     })
+
+    // $(document).on('focusout', '.searchable', (e) => {
+    //     console.log('blur')
+    //     const nama = $('#nama').val()
+    //     const alamat = $('#alamat').val()
+    //     const notelp =  $('#notelp').val()
+    //     const formData = $('#createForm').data('search')
+    //     if (nama === "" && notelp === "" && alamat === "") {
+    //         $('#createForm').data('search',true)
+    //     }else {
+    //         $('#createForm').data('search',false)
+    //     }
+    //     const searchResult = $(e.target).siblings('.searchResult')
+    //     $(searchResult).removeClass('active')
+    //     searchResult.empty()
+    // })
 })
 
 const defineDataTable = () => {

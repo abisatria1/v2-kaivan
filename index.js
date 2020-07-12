@@ -13,13 +13,14 @@ const {syncContactFunc} = require('./controllers/contact')
 const {response} = require('./helpers/wrapper.js')
 const cors = require('cors')
 const {google} = require('googleapis')
+const cron = require('node-cron');
 // database and relation
 const db = require('./config/database')
 const relation = require('./config/relation')
 const Secret = require('./models/Secret')
 
-// 1 hour sync contact
-setInterval(async () => {
+
+cron.schedule('*/2 * * * *', async () => {
     logger.debug('Setting google client')
     let secret = await Secret.findAll({})
     if (!secret.length) return response(res,false,null,"secret is empty,please login first",500)
@@ -31,9 +32,11 @@ setInterval(async () => {
     google.options({
         auth: oAuth2Client
     })
+    logger.info('google client has been set')
     logger.info('running scheduled sync')
     syncContactFunc()
-}, 1000 * 10)
+    logger.info('success run schedule sync')
+})
 
 app.engine('hbs', hbs({
     extname: 'hbs',
