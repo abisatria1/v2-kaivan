@@ -39,7 +39,7 @@ router.route('/syncContact')
         contactController.syncContact
     )
 
-router.route('/search/:param')
+router.route('/search')
     .get(
         contactController.searchContact
     )

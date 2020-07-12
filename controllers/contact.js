@@ -201,28 +201,20 @@ const syncContact = async (req,res,next) => {
 }
 
 const searchContact = async (req,res,next) => {
-    const {param} = req.params
+    // const {param} = req.params
     const {value} = req.query
-    let query
     if (value == "" || value == null || !value) return next(customError('query "value" dibutuhkan',400))
-    switch (param) {
-        case "nama":
-            query = {nama : {[Op.like] : `%${value}%`}}
-            break
-        case "alamat": 
-            query = {alamat : {[Op.like] : `%${value}%`}}
-            break
-        case "notelp": 
-            query = {notelp : {[Op.like] : `%${value}%`}}
-            break
-        default:
-            break
-    }
-    logger.info(`running search by ${param} : ${value}`)
-    if (!query) return next(customError('param tidak valid',400))
+    logger.info(`running search by ${value}}`)
     const contact = await Contact.findAll({
         attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
-        where : query,
+        where : {
+            [Op.or] : [
+                {nama : {[Op.like] : `%${value}%`}},
+                {alamat : {[Op.like] : `%${value}%`}},
+                {notelp : {[Op.like] : `%${value}%`}},
+                {namaKantor : {[Op.like] : `%${value}%`}},
+            ]
+        },
         limit : 10  
     })
     response(res,true,contact,'Berhasil mendapatkan data pelanggan',200)
