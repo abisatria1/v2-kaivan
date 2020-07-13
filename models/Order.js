@@ -15,8 +15,11 @@ const Order = db.define(
             type : Sequelize.INTEGER,
             allowNull : false
         },
-        katerangan : {
+        keterangan : {
             type : Sequelize.STRING
+        },
+        harga : {
+            type : Sequelize.INTEGER
         },
         isPay : {
             type : Sequelize.INTEGER,

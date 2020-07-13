@@ -150,6 +150,10 @@ q:before, q:after {
 	margin-bottom: 100px !important;
 }
 
+.pageTitleName {
+	font-size: 32px !important;
+}
+
 /* responsive */
 
 @media (max-width: 992px) { 

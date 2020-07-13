@@ -12,6 +12,7 @@ const addOrderSchema = Joi.object().keys({
     order : Joi.object({
         tanggalOrder : Joi.string().required(),
         jumlah : Joi.number().required().min(1),
+        harga : Joi.number().required().min(1),
         jam : Joi.string().allow(''),
         status : Joi.number().required().min(1),
         keterangan : Joi.string().allow(''),
@@ -31,6 +32,7 @@ const updateOrderSchema = Joi.object().keys({
     }).required(),
     order : Joi.object({
         jumlah : Joi.number().min(1),
+        harga : Joi.number().min(1),
         jam : Joi.string().allow(''),
         status : Joi.number().min(1),
         keterangan : Joi.string().allow(''),

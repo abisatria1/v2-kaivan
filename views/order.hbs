@@ -1,6 +1,6 @@
 {{> orderNavbar }}
 
-<div class="container-md ml-auto mr-auto mt-4">
+<div class="p-4 ml-auto mr-auto mt-4">
     <div class="pageTitle">
         <div class="pageTitleName">{{title}}</div>
         <div class="orderDate">7 Januari 2020</div>
@@ -11,43 +11,100 @@
                 <tr>
                     <th scope="col">No</th>
                     <th scope="col">Nama</th>
-                    <th scope="col">Alamat</th>
                     <th scope="col">Notelp</th>
-                    <th scope="col">Jam</th>
+                    <th scope="col">Alamat</th>
                     <th scope="col">Jumlah</th>
+                    <th scope="col">Harga</th>
+                    <th scope="col">Jam</th>
                     <th scope="col">Sopir</th>
                     <th scope="col">Jasa</th>
                     <th scope="col">Status</th>
                     <th scope="col">Keterangan</th>
+                    <th scope="col">Button</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td contenteditable="true" id="coba">Kadek</td>
-                    <td>Lembusora Lorem, ipsum.</td>
-                    <td>082146432578</td>
-                    <td>07:00</td>
-                    <td>1</td>
-                    <td>DGD</td>
-                    <td></td>
-                    <td>Proses</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Kadek</td>
-                    <td>Lembusora</td>
-                    <td>082146432578</td>
-                    <td>07:00</td>
-                    <td>1</td>
-                    <td>DGD</td>
-                    <td></td>
-                    <td>Proses</td>
-                    <td></td>
-                </tr>
-                
-            </tbody>
         </table>
     </div>
 </div>
+
+<div id="modal" class="m-auto" >
+    <div class="modalWrapper">
+        <form class="needs-validation" id="createForm" novalidate autocomplete="off" data-search="true">
+            <input type="hidden" id="googleId">
+            <input type="hidden" id="namaKantor">
+            <div class="form-group">
+                <label for="tanggalOrder">Tanggal Order</label>
+                <input type="text" class="form-control" name="tanggalOrder" id="tanggalOrder" required autofocus="false">
+            </div>
+            <div class="form-group">
+                <label for="nama">Nama</label>
+                <input type="text" class="form-control searchable" name="nama" id="nama" minlength="3"  required autofocus="true">
+                <div class="invalid-feedback"></div>
+                {{!-- search result --}}
+                <div class="searchResult">
+                    <!-- search result -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notelp">Notelp</label>
+                <input type="tel" class="form-control" name="notelp" id="notelp" minlength="6" 
+                pattern="^(^\+62\s?|^0)(\d{3,4}-?){2}\d{3,4}$" required>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="alamat">Alamat</label>
+                <input type="text" class="form-control" name="alamat" id="alamat" required>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="jumlah">Jumlah</label>
+                <input type="number" class="form-control" name="jumlah" id="jumlah" required>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="jam">Jam</label>
+                <input type="text" class="form-control" name="jam" id="jam">
+            </div>
+            <div class="form-group">
+                <label for="harga">Harga</label>
+                <input type="number" class="form-control" name="harga" id="harga" required>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="sopir">Sopir</label>
+                <select class="custom-select" id="sopir" name="sopir[]" multiple>
+                    
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="jasa">Jasa</label>
+                <select class="custom-select" id="jasa" name="jasa">
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select class="custom-select" id="status" name="status" required>
+                    <option selected value="1">--Status--</option>
+                    <option value="1">Proses</option>
+                    <option value="2">Diselesaikan</option>
+                    <option value="3">Batal</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="keterangan">Keterangan</label>
+                <textarea class="form-control" name="keterangan" id="keterangan" cols="10" rows="2"></textarea>
+            </div>
+            <div class="text-right mt-4 button" >
+                <a href=""data-izimodal-close="" class="btn btn-danger">Cancel</a>
+                <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+            <div class="text-center mt-4  d-none loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

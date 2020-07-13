@@ -104,11 +104,11 @@ const getAllOrderByDate = async (req,res,next) => {
 const addOrder = async (req,res,next) => {
     const {contact} = req
     const {order,driverId,partnerId} = req.body
-    const {tanggalOrder,jumlah,jam,status,keterangan} = order
+    const {tanggalOrder,jumlah,jam,status,keterangan,harga} = order
     
     // add order with customer
     const createOrder = await Order.create({
-        tanggalOrder,jumlah,jam,status,keterangan,
+        tanggalOrder,jumlah,jam,status,keterangan,harga,
         partnerId : partnerId == -1 ? null : partnerId,
         customer : {
             contactGoogleId : contact.resourceName
