@@ -35,7 +35,15 @@ const Order = db.define(
         }
     },
     {
-        paranoid : true
+        paranoid : true,
+        hooks : {
+            afterDestroy: async (order, options) => {
+                const result = await order.getDrivers()
+                for (let i = 0; i < result.length; i++) {
+                    await result[i].order_driver.destroy()
+                }
+            }
+        }
     }
 )
 

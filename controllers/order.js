@@ -6,25 +6,38 @@ const Customer = require('../models/Customer')
 const Driver = require('../models/Driver')
 const Partner = require('../models/Partner')
 const Payment = require('../models/Payment')
+const Contact = require('../models/Contact')
 
-const getDetailOrder = async (orderId) => {
+const getDetailOrder = async (orderId = 0) => {
     const order = await Order.findOne({
         attributes : {exclude : ['createdAt','updatedAt','deletedAt','customerId','paymentId','partnerId','driverId']},
         include : [
             {
                 model : Customer,
-                attributes : {exclude : ['createdAt','updatedAt','deletedAt']}
+                attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
+                include : [{
+                    model : Contact,
+                    attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+                }]
             },
             {
                 model : Driver,
                 attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
                 through : {
                     attributes : []
-                }
+                },
+                include : [{
+                    model : Contact,
+                    attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+                }]
             },
             {
                 model : Partner,
-                attributes : {exclude : ['createdAt','updatedAt','deletedAt']}
+                attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
+                include : [{
+                    model : Contact,
+                    attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+                }]
             },
             {
                 model : Payment,
@@ -48,18 +61,30 @@ const getAllOrderByDate = async (req,res,next) => {
         include : [
             {
                 model : Customer,
-                attributes : {exclude : ['createdAt','updatedAt','deletedAt']}
+                attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
+                include : [{
+                    model : Contact,
+                    attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+                }]
             },
             {
                 model : Driver,
                 attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
                 through : {
                     attributes : []
-                }
+                },
+                include : [{
+                    model : Contact,
+                    attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+                }]
             },
             {
                 model : Partner,
-                attributes : {exclude : ['createdAt','updatedAt','deletedAt']}
+                attributes : {exclude : ['createdAt','updatedAt','deletedAt']},
+                include : [{
+                    model : Contact,
+                    attributes : {exclude : ['createdAt','updatedAt','deletedAt','raw']}
+                }]
             },
             {
                 model : Payment,
@@ -77,23 +102,54 @@ const getAllOrderByDate = async (req,res,next) => {
 }
 
 const addOrder = async (req,res,next) => {
-    const {customer} = req
-    console.log(customer)
-    const {driverId,partnerId} = req.body
-    req.body.order.customerId = customer.id
-    if (partnerId != -1) req.body.order.partnerId = partnerId
-    const order = await Order.create(req.body.order)
-    if (driverId != -1) await order.addDriver(driverId)
-    const result = await getDetailOrder(order.id)
+    const {contact} = req
+    const {order,driverId,partnerId} = req.body
+    const {tanggalOrder,jumlah,jam,status,keterangan} = order
+    
+    // add order with customer
+    const createOrder = await Order.create({
+        tanggalOrder,jumlah,jam,status,keterangan,
+        partnerId : partnerId == -1 ? null : partnerId,
+        customer : {
+            contactGoogleId : contact.resourceName
+        }
+    },{
+        include : [Customer]
+    })
+
+    // cek driver apakah kosong atau tidak
+    if (driverId.length) {
+        await createOrder.setDrivers(driverId)
+    }
+
+    const result = await getDetailOrder(createOrder.id)
     response(res,true,result,'Order berhasil ditambahkan',201)
 }
 
 const updateOrder = async (req,res,next) => {
-    // 
+    // update order
+    let {order,driverId,partnerId} = req.body
+    // settign partner id
+    order.partnerId = partnerId == -1 ? null : partnerId
+    const orderInstance = await Order.findByPk(req.params.orderId)
+    const update = await orderInstance.update(order)
+    // update driver
+    await orderInstance.setDrivers(driverId)
+    const result = await getDetailOrder(orderInstance.id)
+    response(res,true,result,'Order berhasil diubah',200)
+}
+
+const deleteOrder = async (req,res,next) => {
+    const order=  await Order.findByPk(req.params.orderId)
+    if (!order) return next(customError('Order tidak ditemukan',400))
+    const destroy = await order.destroy()
+    return response(res,true,{},'Data berhasil dihapus',200)
 }
 
 
 module.exports = {
     getAllOrderByDate,
-    addOrder
+    addOrder,
+    updateOrder,
+    deleteOrder
 }
