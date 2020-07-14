@@ -61,11 +61,11 @@ const loadJasa = async () => {
     })
 }
 
-const updateSopir = async (id,data) => {
+const updateOrder = async (id,data) => {
     return new Promise (async (resolve,reject) => {
         try {
             const result = await axios({
-                url : `/api/driver/${id}`,
+                url : `/api/order/${id}`,
                 method : 'PATCH',
                 data : data
             })

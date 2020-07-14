@@ -28,6 +28,11 @@ $(document).ready(async () => {
                 placeholder: "--Sopir--",
                 allowClear: true    
             })
+            $('.clockpicker').clockpicker({
+                placement: 'top',
+                align: 'right',
+                autoclose: true
+            })
         }
     }) 
 
@@ -57,7 +62,7 @@ $(document).ready(async () => {
                         status : $('#status').val(),
                     },
                     driverId : $('#sopir').val(),
-                    partnerId : $('#jasa').val() == "" ? -1 : $('#jasa').val(),
+                    partnerId : $('#jasa').val(),
                 }
 
                 // sending data
@@ -127,146 +132,149 @@ $(document).ready(async () => {
         }
     })
 
-    // // live editing
-    // // live editing content
-    // $('#orderTable').on('dblclick', '.editable' , (event) => {
-    //     const elem = event.target
-    //     const colName = $(elem).data('colName')
-    //     const value = $(elem).text()
-    //     $(elem).data('prevValue',value)
-    //     $(elem).text('')
+    // live editing
+    // live editing content
+    $('#orderTable').on('dblclick', '.editable' , async (event) => {
+        if ( $('table').data('active') == 'driverId') {
+            // close that active
+            const driverEdit = $('table').find('#sopirEdit')
+            const elem = $(driverEdit).parents('td')
+            const prevValue = $(elem).data('prevValue')
+            $(elem).empty()
+            $(elem).text(prevValue)
+        } 
+        const elem = event.target
+        const colName = $(elem).data('colName')
+        const value = $(elem).text()
+        $(elem).data('prevValue',value)
+        $(elem).text('')
         
-    //     let str = "" , option =""
-    //     switch (colName) {
-    //         case "status":
-    //                 if (value == "Aktif") {
-    //                     option = `
-    //                     <option selected value="Aktif">Aktif</option>
-    //                     <option value="Pasif">Pasif</option>`
-    //                 }else {
-    //                     option = `
-    //                     <option  value="Aktif">Aktif</option>
-    //                     <option selected value="Pasif">Pasif</option>`
-    //                 }
-    //                 str = `<select class="custom-select">${option}</select>`
-    //                 break
-    //             case "tipePembayaran" : 
-    //                 if (value == "1" || value == 1) {
-    //                     option = `
-    //                     <option selected value="1">1</option>
-    //                     <option value="2">2</option>`
-    //                 }else {
-    //                     option = `
-    //                     <option  value="1">1</option>
-    //                     <option selected value="2">2</option>`
-    //                 }
-    //                 str = `<select class="custom-select">${option}</select>`
-    //                 break
-    //         default:
-    //             str = `<textarea class="form-control" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`
-    //             break
-    //     }
-    //     $(elem).append(str)
-    //     $(elem).find('textarea').focus()
-    // })
+        let str = "" , option =""
+        switch (colName) {
+            case "order.jumlah" : 
+                str = `<input type="number" class="form-control" value="${value}">`
+                $(elem).append(str)
+                $(elem).find('input').focus()
+                break
+            case "order.harga" : 
+                str = `<input type="number" style="width : 100px" class="form-control" value="${value}">`
+                $(elem).append(str)
+                $(elem).find('input').focus()
+                break
+            case "order.jam":
+                str = `<input type="text" style="width : 80px" class="form-control" id="changeTime" style="background-color : white;" value="${value}" readonly>`
+                $(elem).append(str)
+                $(elem).find('input').focus()
+                $('#changeTime').clockpicker({
+                    placement: 'top',
+                    align: 'right',
+                    autoclose: true,
+                })
+                break
+            case "driverId" : 
+                // disable editable
+                $('table').data('active','driverId')
+                str = `<select id="sopirEdit" style="width: 200px" class="custom-select" multiple></select>`
+                let button = `
+                <div class="mt-2 editBtn">
+                    <button id="editCancelBtn" class="btn btn-danger mr-2 btn-sm">Cancel</button>
+                    <button id="editSuccessBtn" class="btn btn-success btn-sm">Save</button>
+                </div>`
+                $(elem).append(str)
+                $(elem).append(button)
+                const dataSopir = value.split(',')
+                await isiSopir(dataSopir,'#sopirEdit')
+                $('#sopirEdit').select2({
+                    width: 'resolve',
+                    placeholder: "--Sopir--",
+                    allowClear: true,
+                })
+                break
+            case "partnerId" : 
+                // disable editable
+                str = `<select id="jasaEdit" style="width: 200px" class="custom-select"></select>`
+                $(elem).append(str)
+                $(elem).find('select').focus()
+                await isiJasa(value,'#jasaEdit')
+                break
+            case 'order.status' : 
+                str = ` <select class="custom-select" style="width: 150px" id="status" name="status" required>
+                                <option value="1">Proses</option>
+                                <option value="2">Diselesaikan</option>
+                                <option value="3">Batal</option>
+                            </select>`
+                $(elem).append(str)
+                $(elem).find('select').focus()
+                $(elem).find('option').each((i,item) => {
+                    if ($(item).text() == value) $(item).attr('selected', 'selected')
+                })
+                break
+            default:
+                str = `<textarea class="form-control" style="width : 200px" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`
+                $(elem).append(str)
+                break
+        }
+        $(elem).find('textarea').focus()
+    })
 
-    // $('#orderTable').on('taphold', '.editable' , (event) => {
-    //     const elem = event.target
-    //     const colName = $(elem).data('colName')
-    //     const value = $(elem).text()
-    //     $(elem).data('prevValue',value)
-    //     $(elem).text('')
-        
-    //     let str = "" , option =""
-    //     switch (colName) {
-    //         case "statusJasa":
-    //                 if (value == "Aktif") {
-    //                     option = `
-    //                     <option selected value="Aktif">Aktif</option>
-    //                     <option value="Pasif">Pasif</option>`
-    //                 }else {
-    //                     option = `
-    //                     <option  value="Aktif">Aktif</option>
-    //                     <option selected value="Pasif">Pasif</option>`
-    //                 }
-    //                 str = `<select class="custom-select">${option}</select>`
-    //                 break
-    //             case "tipePembayaran" : 
-    //                 if (value == "1" || value == 1) {
-    //                     option = `
-    //                     <option selected value="1">1</option>
-    //                     <option value="2">2</option>`
-    //                 }else {
-    //                     option = `
-    //                     <option  value="1">1</option>
-    //                     <option selected value="2">2</option>`
-    //                 }
-    //                 str = `<select class="custom-select">${option}</select>`
-    //                 break
-    //         default:
-    //             str = `<textarea class="form-control" name="text" rows="2" cols="10" wrap="soft">${value}</textarea>`
-    //             break
-    //     }
-    //     $(elem).append(str)
-    // })
+    // update sopir
+    $(document).on('click', '#editCancelBtn' , (e) => {
+        const elem = $(e.target).parents('td')
+        const prevValue = $(elem).data('prevValue')
+        $(elem).empty()
+        $(elem).text(prevValue)
+    })  
+    $(document).on('click', '#editSuccessBtn' ,async (e) => {
+        const value = $('#sopirEdit').val()
+        const editBtn = $('td .editBtn')
+        const elem = $(editBtn).parents('td')
+        $(editBtn).hide()
+        await updateEventOrder(value,elem,orderTable)
+
+        // update data
+        syncContact()
+        $(elem).removeClass('hasChange')
+    })
     
-    // $('#orderTable').on('blur', '.editable' , async (event) => {
-    //     const textarea = event.target //textarea
-    //     const elem = $(textarea).parent()
+    $('#orderTable').on('blur', '.editable' , async (event) => {
+        const textarea = event.target //textarea
+        const elem = $(textarea).parents('td') //cell / td
+        $(textarea).attr('disabled' , true)
+        const value = $(textarea).val()
+        const prevValue = $(elem).data('prevValue')
+        // cek kolom
+        if ($(elem).data('colName') == 'driverId') return
+        else if ($(elem).data('colName') == 'partnerId') {
+            const rowData = orderTable.row($(elem).parents('tr')).data()
+            if (!rowData.partner && value == -1) {
+                $(textarea).remove()
+                return $(elem).text(prevValue)
+            }else if (!rowData.partner && value != -1) {
+                // 
+            }else {
+                if (rowData.partner.id  == value) {
+                    $(elem).empty()
+                    return $(elem).text(prevValue)  
+                }
+            }
+        }else if ($(elem).data('colName') == 'order.status') {
+            if($('td select option:selected').text() == prevValue) {
+                $(textarea).remove()
+                return $(elem).text(prevValue)
+            }
+        }
 
-    //     const value = $(textarea).val()
-    //     const prevValue = $(elem).data('prevValue')
-    //     if (value === prevValue) {
-    //         $(textarea).remove()
-    //         return $(elem).text(prevValue)
-    //     }
+        if (value === prevValue) {
+            $(textarea).remove()
+            return $(elem).text(prevValue)
+        }
 
-    //     const colName = $(elem).data('colName')
-    //     const row = $(elem).parent()    
+        await updateEventOrder(value,elem,orderTable)
 
-    //     const cellInfo = jasaTable.cell(elem)[0][0]
-    //     const rowData = jasaTable.row(row).data()
-        
-    //     const raw = {
-    //         nama : rowData.contact.nama == null ? "" : rowData.contact.nama,
-    //         notelp : rowData.contact.notelp == null ? "": rowData.contact.notelp,
-    //         alamat : rowData.contact.alamat == null ? "": rowData.contact.alamat,
-    //         namaKantor : rowData.contact.namaKantor == null ? "" : rowData.contact.namaKantor,
-    //         norek : rowData.norek == null ? "" : rowData.norek,
-    //         statusJasa : rowData.statusJasa == null ? "" : rowData.statusJasa,
-    //         tipePembayaran : rowData.tipePembayaran == null ? "" : rowData.tipePembayaran,
-    //         keterangan : rowData.keterangan,
-    //         google : {
-    //             googleId : rowData.contact.googleId
-    //         }
-    //     }
-    //     raw[colName] = value
-
-    //     try {
-    //         await updateJasa(rowData.id,raw)
-    //         await drawTable(jasaTable)
-    //         popUpMessage({
-    //             title : 'Perubahan berhasil disimpan'
-    //         })
-    //         $(textarea).remove()
-    //         addAfterEditAnimations(cellInfo,jasaTable,true)
-    //     } catch (err) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Data tidak valid',
-    //             text : err.data ? err.data.message : err.message,
-    //             showConfirmButton: true,
-    //             timer: 3000
-    //         })
-            
-    //         addAfterEditAnimations(cellInfo,jasaTable,false)
-    //         $(elem).text(prevValue)
-    //     }
-        
-    //     // update data
-    //     syncContact()
-    //     $(elem).removeClass('hasChange')
-    // })
+        // update data
+        syncContact()
+        $(elem).removeClass('hasChange')
+    })
 
      //delete
     $('table').on('click', '.deleteBtn' , (e) => {
@@ -347,7 +355,7 @@ $(document).ready(async () => {
 })
 
 const defineDataTable = () => {
-    const jasa = $('#orderTable').DataTable({
+    const order = $('#orderTable').DataTable({
         columns : [
             {'defaultContent'  : ""},
             {"data" : 'customer.contact.nama'},
@@ -357,7 +365,7 @@ const defineDataTable = () => {
             {"data" : 'harga'},
             {"data" : 'jam'},
             {"data" : 'drivers[,].kodeSopir'},
-            {"data" : 'partner.contact'},
+            {"data" : 'partner', "defaultContent" : ""},
             {"data" : 'status'},
             {"data" : 'keterangan'},
             {
@@ -370,7 +378,7 @@ const defineDataTable = () => {
         ],
         columnDefs: [
             {
-                'targets': [1,2,3,4,5,6,7],
+                'targets': [1,2,3,4,5,6,7,8,9,10],
                 'createdCell':  function (td, cellData, rowData, row, col) {
                     switch (col) {
                         case 1:
@@ -383,25 +391,25 @@ const defineDataTable = () => {
                             $(td).data('colName', 'alamat')
                             break
                         case 4:
-                            $(td).data('colName', 'jumlah')
+                            $(td).data('colName', 'order.jumlah')
                             break
                         case 5:
-                            $(td).data('colName', 'harga')
+                            $(td).data('colName', 'order.harga')
                             break
                         case 6:
-                            $(td).data('colName', 'jam')
+                            $(td).data('colName', 'order.jam')
                             break
                         case 7:
-                            $(td).data('colName', 'sopir')
+                            $(td).data('colName', 'driverId')
                             break
                         case 8:
-                            $(td).data('colName', 'jasa')
+                            $(td).data('colName', 'partnerId')
                             break
-                        case 7:
-                            $(td).data('colName', 'status')
+                        case 9:
+                            $(td).data('colName', 'order.status')
                             break
-                        case 7:
-                            $(td).data('colName', 'keterangan')
+                        case 10:
+                            $(td).data('colName', 'order.keterangan')
                             break
                         default:
                             break
@@ -412,26 +420,34 @@ const defineDataTable = () => {
             {
                 targets : [8],
                 render : (data,type,row) => {
-                    return data ? data.nama : ""
+                    if (data == null || !data) return
+                    return data ? data.contact.nama : ""
                 }
             }
-        ]
+        ],
+        rowCallback:  (row, data) => {
+            console.log(data)
+            if (data.status == "Proses") {
+                $(row).addClass('table-warning')
+            }else if (data.status == "Diselesaikan" ) {
+                $(row).addClass('table-primary')
+            }else if (data.status == "Batal") {
+                $(row).addClass('table-danger')
+            }
+        }
     })
     // tambah nomer
-    jasa.on( 'order.dt search.dt', function () {
-        jasa.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+    order.on( 'order.dt search.dt', function () {
+        order.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
             cell.innerHTML = i+1;
         } );
     } ).draw()
-    return jasa
+    return order
 }
 
 const drawTable = async (table,date="") => {
-    console.log('datttt')
     $('.orderDate').text(formatDateToIndo(date))
     const order = await loadOrder(date)
-    console.log(order)
-    console.log(date)
     table.clear()
     table.rows.add(order.data)
     table.draw()
@@ -554,24 +570,44 @@ const addAfterEditAnimations = async ({row,column} , table, type) => {
     }
 }
 
-const isiSopir = async () => {
+const isiSopir = async (prevData = [], elem = "#sopir") => {
     const sopir = await loadSopir()
     let str = ``
-    $(sopir.data).each((i,elem) => {
-        str += `<option value="${elem.id}">${elem.kodeSopir}</option>`
-    })
-    $('#sopir').append(str)
+    if (prevData.length != 0) {
+        $(sopir.data).each((i,elem) => {
+            if (prevData.indexOf(elem.kodeSopir) != -1) {
+                str += `<option selected value="${elem.id}">${elem.kodeSopir}</option>`
+            }else {
+                str += `<option value="${elem.id}">${elem.kodeSopir}</option>`
+            }
+        })
+    }else {
+        $(sopir.data).each((i,elem) => {
+            str += `<option value="${elem.id}">${elem.kodeSopir}</option>`
+        })
+    }
+    $(`${elem}`).append(str)
 }   
 
-const isiJasa = async () => {
+const isiJasa = async (prevJasa = "", elem = "#jasa") => {
     const jasa = await loadJasa()
-    let str = `
-        <option selected value="">--Jasa--</option>
-    `
-    $(jasa.data).each((i,elem) => {
-        str += `<option value="${elem.id}">${elem.contact.nama}</option>`
-    })
-    $('#jasa').append(str)
+    let str = ``
+    if (prevJasa !== "" || elem == "#jasaEdit") {
+        str = `<option value="-1"></option>`
+        $(jasa.data).each((i,elem) => {
+            if (elem.contact.nama == prevJasa) {
+                str += `<option selected value="${elem.id}">${elem.contact.nama}</option>`
+            }else {
+                str += `<option value="${elem.id}">${elem.contact.nama}</option>`
+            }
+        })
+    }else {
+        str = `<option selected value="-1">--Jasa--</option>`
+        $(jasa.data).each((i,elem) => {
+            str += `<option value="${elem.id}">${elem.contact.nama}</option>`
+        })
+    }
+    $(`${elem}`).append(str)
 }
 
 const dateNow = (date) => {
@@ -629,4 +665,61 @@ const formatDateToIndo = (date) => {
             break;
     }
     return `${day} ${month} ${year}`
+}
+
+const updateEventOrder  =  async (value,elem,orderTable) => {
+    const colName = $(elem).data('colName')
+    const row = $(elem).parent()    
+
+    const cellInfo = orderTable.cell(elem)[0][0]
+    const rowData = orderTable.row(row).data()
+    //
+    let driverId = []
+    if (rowData.drivers.length) driverId = rowData.drivers.map(sopir => sopir.id)
+    const raw = {
+        nama : rowData.customer.contact.nama == null ? "" : rowData.customer.contact.nama,
+        notelp : rowData.customer.contact.notelp == null ? "": rowData.customer.contact.notelp,
+        alamat : rowData.customer.contact.alamat == null ? "": rowData.customer.contact.alamat,
+        namaKantor : rowData.customer.contact.namaKantor == null ? "" : rowData.customer.contact.namaKantor,
+        order : {
+            
+        },
+        driverId,
+        partnerId : rowData.partner == null ? -1 : rowData.partner.id,
+        google : {
+            googleId : rowData.customer.contact.googleId
+        }
+    }
+    const isOrder = colName.split('.')
+
+    if (isOrder.length != 1) {
+        raw.order[isOrder[1]] = value
+    }else {
+        raw[colName] = value
+    }
+
+    try {
+        await updateOrder(rowData.id,raw)
+        await drawTable(orderTable,$('#tanggal').val())
+        popUpMessage({
+            title : 'Perubahan berhasil disimpan'
+        })
+        $(elem).empty()
+        if (colName != 'order.status') {
+            addAfterEditAnimations(cellInfo,orderTable,true)
+        }
+    } catch (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Data tidak valid',
+            text : err.data ? err.data.message : err.message,
+            showConfirmButton: true,
+            timer: 3000
+        })
+        if (colName != 'order.status') {
+            addAfterEditAnimations(cellInfo,orderTable,false)
+        }
+        $(elem).empty()
+        $(elem).text($(elem).data('prevValue'))
+    }
 }

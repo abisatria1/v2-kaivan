@@ -96,7 +96,11 @@ const getAllOrderByDate = async (req,res,next) => {
                 {tanggalOrder : {[Op.gte] : `${tanggalAwal} 00:00:00`}},
                 {tanggalOrder : {[Op.lte] : `${tanggalAkhir} 23:59:59` }}
             ]
-        }
+        },
+        order : [
+            ['status', 'ASC'],
+            ['jam', 'ASC']
+        ]
     })
     response(res,true,order,'Semua data order berhasil didapatkan',200)
 }
