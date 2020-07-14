@@ -9,11 +9,29 @@ const Order = db.define(
             allowNull : false
         },
         jam : {
-            type : Sequelize.TIME
+            type : Sequelize.STRING
         },
         status : {
             type : Sequelize.INTEGER,
-            allowNull : false
+            allowNull : false,
+            get() {
+                let data = this.getDataValue('status')
+                let string = ""
+                switch (data) {
+                    case 1:
+                        string =  'Proses'
+                        break
+                    case 2: 
+                        string =  'Diselesaikan'
+                        break
+                    case 3: 
+                        string =  'Batal'
+                        break
+                    default:
+                        break
+                }
+                return string
+            }
         },
         keterangan : {
             type : Sequelize.STRING
