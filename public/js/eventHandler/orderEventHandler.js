@@ -1,8 +1,5 @@
 
 $(document).ready(async () => {
-    const orderTable = defineDataTable()
-    await drawTable(orderTable,dateNow())
-    isiJasa()
     const modal = $('#modal').iziModal({
         title : 'Tambah Data Order',
         subtitle : 'Diharapkan mengisi data dengan benar dan bertanggung jawab',
@@ -15,6 +12,8 @@ $(document).ready(async () => {
                 if ($(elem).attr('id') !== 'tanggalOrder') {
                     $(elem).val('')
                 }
+                $('#jasa').val(-1)
+                $('#status').val(1)
             })
             $("#createForm").removeClass('was-validated')
             $("#createForm").data('search',true)
@@ -35,6 +34,10 @@ $(document).ready(async () => {
             })
         }
     }) 
+    syncContact()
+    const orderTable = defineDataTable()
+    await drawTable(orderTable,dateNow())
+    isiJasa()
 
     // create
     $(document).on('submit','#createForm',async (e) => {
@@ -182,7 +185,7 @@ $(document).ready(async () => {
                 </div>`
                 $(elem).append(str)
                 $(elem).append(button)
-                const dataSopir = value.split(',')
+                const dataSopir = value.split(' ')
                 await isiSopir(dataSopir,'#sopirEdit')
                 $('#sopirEdit').select2({
                     width: 'resolve',
@@ -364,7 +367,7 @@ const defineDataTable = () => {
             {"data" : 'jumlah'},
             {"data" : 'harga'},
             {"data" : 'jam'},
-            {"data" : 'drivers[,].kodeSopir'},
+            {"data" : 'drivers[ ].kodeSopir'},
             {"data" : 'partner', "defaultContent" : ""},
             {"data" : 'status'},
             {"data" : 'keterangan'},

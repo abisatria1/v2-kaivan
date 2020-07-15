@@ -215,7 +215,7 @@ const searchContact = async (req,res,next) => {
                 {namaKantor : {[Op.like] : `%${value}%`}},
             ]
         },
-        limit : 10  
+        limit : 30 
     })
     response(res,true,contact,'Berhasil mendapatkan data pelanggan',200)
 }

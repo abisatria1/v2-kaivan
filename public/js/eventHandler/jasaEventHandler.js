@@ -13,6 +13,8 @@ $(document).ready(async () => {
             })
             $("#createForm").removeClass('was-validated')
             $("#createForm").data('search',true)
+            $('#statusJasa').val('Aktif')
+            $('#tipePembayaran').val("")
         }
     }) 
 
