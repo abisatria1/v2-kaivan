@@ -51,7 +51,7 @@ router.route('/googleOauth')
 
 router.route('/google')
     .get(
-        passport.authenticate('google', {session : false}),
+        passport.authenticate('google', {session : false, failureRedirect : '/login?user=false'}),
         customerController.successAuth
     )
 

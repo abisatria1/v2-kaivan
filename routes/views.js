@@ -58,4 +58,12 @@ router.route('/index')
         res.render('index')
     })
 
+router.route('/login')
+    .get((req,res,next) => {
+        if (req.query.user) {
+            return res.render('login' , {layout : false , user : req.query.user})
+        }
+        res.render('login' , {layout : false})
+    })
+
 module.exports = router

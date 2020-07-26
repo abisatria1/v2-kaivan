@@ -112,7 +112,10 @@ const searchByParam = async (req,res,next) => {
 }
 
 const successAuth = async (req,res,next) => {
-    response(res,true,{},'Berhasil melakukan authentikasi',200)
+    if (!req.user || req.user == null) {
+        return res.redirect('/login?user=' + 'false')
+    }
+    res.redirect('/login?user=' + JSON.stringify(req.user))
 }
 
 // contact middleware

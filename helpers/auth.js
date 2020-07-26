@@ -10,14 +10,21 @@ const googlePassport = new GoogleStrategy({
     clientSecret : process.env.GOOGLE_CLIENT_SECRET,
     callbackURL : process.env.GOOGLE_CALLBACK_URL,
 },async (accessToken,refreshToken,profile,done) => {
-    const all = await Secret.findAll({})
-    for (let i = 0; i < all.length; i++) {
-        await all[i].destroy()
+    try {
+        const all = await Secret.findAll({})
+        for (let i = 0; i < all.length; i++) {
+            await all[i].destroy()
+        }
+        if (profile.emails[0].value != "abi.kadek@gmail.com" && profile.emails[0].value != "wddn07@gmail.com"){
+            return done(null,null)
+        }
+        logger.debug({accessToken,refreshToken,profile})
+        logger.debug('assigning oauth client')
+        const secret = await Secret.create({accessToken,refreshToken})
+        done(null,profile)
+    } catch (error) {
+        done(error,null)
     }
-    logger.debug({accessToken,refreshToken,profile})
-    logger.debug('assigning oauth client')
-    const secret = await Secret.create({accessToken,refreshToken})
-    done(null,profile)
 })
 
 passport.use(googlePassport)

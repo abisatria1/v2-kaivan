@@ -106,9 +106,16 @@
           <span>Contact</span></a>
       </li>
 
-      <!-- Divider -->
-      <hr class="sidebar-divider d-none d-md-block">
+<!-- Divider -->
+      <hr class="sidebar-divider my-0">
+      <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
+          <i class="fas fa-fw fa-sign-out-alt fa-fw mr-2"></i>
+          <span>Logout</span>
+        </a>
+      </li>
 
+      <hr class="sidebar-divider d-none d-md-block">
       <!-- Sidebar Toggler (Sidebar) -->
       <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -160,7 +167,7 @@
         <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" href="/login">Logout</a>
+          <a class="btn btn-primary" href="" id="logout">Logout</a>
         </div>
       </div>
     </div>
@@ -204,6 +211,15 @@
         const result = elem.parent().addClass('active')
     }
     $(document).ready(() => {
+        const user = sessionStorage.getItem('user')
+        if (!user) {
+          return window.location.href = '/login'
+        }
+        // logout
+        $('#logout').click(() => {
+          sessionStorage.removeItem('user')
+          return window.location.href = '/login'
+        })
         const title = $('title').text()
         setActiveBar(title)
     })
