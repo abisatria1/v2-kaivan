@@ -45,12 +45,17 @@ router.route('/sopir')
         })
     })
 
-router.route('/pelanggan')
+router.route('/contact')
     .get((req,res,next) => {
-        res.render('pelanggan', {
-            title : 'Pelanggan',
+        res.render('contact', {
+            title : 'contact',
             pageCss : ""
         })
+    })
+
+router.route('/index')
+    .get((req,res,next) => {
+        res.render('index')
     })
 
 module.exports = router

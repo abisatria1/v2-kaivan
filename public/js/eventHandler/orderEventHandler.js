@@ -3,7 +3,7 @@ $(document).ready(async () => {
     const modal = $('#modal').iziModal({
         title : 'Tambah Data Order',
         subtitle : 'Diharapkan mengisi data dengan benar dan bertanggung jawab',
-        headerColor : '#CF5300',
+        headerColor : '#4E73DF',
         closeButton : true,
         focusInput : false,
         width : 700,
@@ -146,12 +146,11 @@ $(document).ready(async () => {
             $(elem).empty()
             $(elem).text(prevValue)
         } 
-        const elem = event.target
-        const colName = $(elem).data('colName')
-        const value = $(elem).text()
+        const elem = event.target.nodeName == "TD" ? $(event.target) : $(event.target).parents('td') 
+        const colName = $(elem).data('colName') == undefined? $(elem).parents('td').data('colName') : $(elem).data('colName')
+        const value = colName == "order.status" ? $(elem).text().trim() : $(elem).text()
         $(elem).data('prevValue',value)
         $(elem).text('')
-        
         let str = "" , option =""
         switch (colName) {
             case "order.jumlah" : 
@@ -263,7 +262,14 @@ $(document).ready(async () => {
         }else if ($(elem).data('colName') == 'order.status') {
             if($('td select option:selected').text() == prevValue) {
                 $(textarea).remove()
-                return $(elem).text(prevValue)
+                if (prevValue == "Proses") {
+                    sts = `<span class="badge badge-warning badge-pill">Proses</span>`
+                }else if (prevValue == "Diselesaikan") {
+                    sts = `<span class="badge badge-primary badge-pill">Diselesaikan</span>`
+                }else {
+                    sts = `<span class="badge badge-danger badge-pill">Batal</span>`
+                }
+                return $(elem).append(sts)
             }
         }
 
@@ -374,8 +380,9 @@ const defineDataTable = () => {
             {
                 "defaultContent" : 
                 `
-                <button class="btn btn-danger deleteBtn"><img src="/images/trash.svg" alt="delete"></button>
-                <button class="btn btn-info viewBtn"><img src="/images/eye.svg" alt="view"></button>
+                <button class="btn btn-datatable btn-icon btn-transparent-dark ml-2 deleteBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
                 `
             },
         ],
@@ -426,18 +433,29 @@ const defineDataTable = () => {
                     if (data == null || !data) return
                     return data ? data.contact.nama : ""
                 }
+            },{
+                targets : [9],
+                render : (data,type,row) => {
+                    if (data == "Proses") {
+                        return `<span class="badge badge-warning badge-pill">Proses</span>`
+                    }else if (data == "Diselesaikan") {
+                        return `<span class="badge badge-primary badge-pill">Diselesaikan</span>`
+                    }else {
+                        return `<span class="badge badge-danger badge-pill">Batal</span>`
+                    }
+                }
             }
         ],
-        rowCallback:  (row, data) => {
-            console.log(data)
-            if (data.status == "Proses") {
-                $(row).addClass('table-warning')
-            }else if (data.status == "Diselesaikan" ) {
-                $(row).addClass('table-primary')
-            }else if (data.status == "Batal") {
-                $(row).addClass('table-danger')
-            }
-        }
+        // rowCallback:  (row, data) => {
+        //     console.log(data)
+        //     if (data.status == "Proses") {
+        //         $(row).addClass('table-warning')
+        //     }else if (data.status == "Diselesaikan" ) {
+        //         $(row).addClass('table-primary')
+        //     }else if (data.status == "Batal") {
+        //         $(row).addClass('table-danger')
+        //     }
+        // }
     })
     // tambah nomer
     order.on( 'order.dt search.dt', function () {
