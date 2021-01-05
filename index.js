@@ -2,40 +2,22 @@ const express = require("express")
 const app = express()
 const bodyParser = require("body-parser")
 const dotenv = require("dotenv").config()
-const axios = require("axios")
 const path = require("path")
 const hbs = require("express-handlebars")
 const loggerConf = require("./config/logger")
 const { setGoogleClient } = require("./helpers/googleClient")
-const { syncContactFunc } = require("./controllers/contact")
+const { google } = require("googleapis")
 
 // another file
 const { response } = require("./helpers/wrapper.js")
 const cors = require("cors")
-const { google } = require("googleapis")
 const cron = require("node-cron")
 // database and relation
 const db = require("./config/database")
 const relation = require("./config/relation")
 const Secret = require("./models/Secret")
-
-cron.schedule("*/2 * * * *", async () => {
-  try {
-    logger.info("running schedule sync")
-    const result = await axios({
-      method: "get",
-      url: "https://kaivan.abisatria.my.id./api/contact/SyncContact",
-    })
-    const data = result.data.data
-    logger.debug(`${data.totalPeople} data berhasil di sinkronisasi`)
-    logger.info("success running schedule sync ")
-  } catch (err) {
-    console.log(err)
-    const error = err.respose ? err.response.message : err.message
-    logger.error(error)
-    logger.error("failed running schedule sync")
-  }
-})
+// service
+const contactService = require("./service/contact")
 
 app.engine(
   "hbs",
@@ -54,6 +36,32 @@ app.use(express.static(path.join(__dirname, "/public")))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
+app.use(setGoogleClient())
+
+cron.schedule("*/2 * * * *", async () => {
+  logger.debug("Setting google client")
+  let secret = await Secret.findAll({})
+  if (!secret.length) return logger.error("Secret is empty, please login first")
+
+  secret = secret[0]
+  access_token = secret.accessToken
+  refresh_token = secret.refreshToken
+  logger.debug("refreshToken = " + refresh_token)
+
+  // make google client
+  const oAuth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET
+  )
+  oAuth2Client.setCredentials({ refresh_token })
+  google.options({
+    auth: oAuth2Client,
+  })
+
+  logger.debug("begin sync with cron job")
+  report = await contactService.syncContactToDatabase()
+  logger.debug("done")
+})
 
 // router
 const customerRouter = require("./routes/customer")
@@ -87,6 +95,7 @@ app.use((req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
+  logger.error(err.message)
   const { message } = err
   const status = err.status || 500
   const data = err.data || null

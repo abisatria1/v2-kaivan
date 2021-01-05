@@ -1,10 +1,3 @@
-const refresh = require("passport-oauth2-refresh")
-const GoogleToken = require("../models/GoogleToken")
-const Secret = require("../models/Secret")
-const axios = require("axios")
-const fs = require("fs")
-const Op = require("sequelize").Op
-
 // models
 const Customer = require("../models/Customer")
 const Contact = require("../models/Contact")
@@ -21,6 +14,8 @@ const getContact = async ({
   syncToken = "",
 }) => {
   return new Promise((resolve, reject) => {
+    pageToken = pageToken == "" ? undefined : { pageToken }
+    syncToken = syncToken == "" ? undefined : { syncToken }
     service.people.connections.list(
       {
         resourceName: "people/me",
@@ -29,13 +24,13 @@ const getContact = async ({
         pageSize: 1000,
         requestSyncToken: true,
         sortOrder: "LAST_MODIFIED_DESCENDING",
-        pageToken,
-        syncToken,
+        ...pageToken,
+        ...syncToken,
       },
       (err, result) => {
         if (err) {
           logger.error("The Api return error " + err)
-          reject(err)
+          return reject(err)
         }
         resolve(result.data)
       }
@@ -108,7 +103,7 @@ const updateGoogleContact = async (
       })
       resolve(hasil.data)
     } catch (err) {
-      logger.error("error happening in create api " + err)
+      logger.error("error happening in update api " + err)
       logger.error(err.response)
       reject(err)
     }
@@ -128,7 +123,7 @@ const deleteGoogleContact = async (
       })
       resolve({ type: true, message: "deleted" })
     } catch (err) {
-      logger.error("error happening in create api " + err)
+      logger.error("error happening in delete api " + err)
       logger.error(err.response)
       reject(err)
     }
