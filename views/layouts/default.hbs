@@ -1,41 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/main.css">
-    {{!-- page css --}}
-    <link rel="stylesheet" href={{pageCss}}>
-    {{!-- add on --}}
-    {{!--bootstrap --}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/main.css">
+  {{!-- page css --}}
+  <link rel="stylesheet" href={{pageCss}}>
+  {{!-- add on --}}
+  {{!--bootstrap --}}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    {{!-- datatables --}}
-    <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+  {{!-- datatables --}}
+  <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
-    {{!-- izimodal --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css">
+  {{!-- izimodal --}}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css">
 
-    {{!-- date picker --}}
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+  {{!-- date picker --}}
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
-    {{!-- select2 --}}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+  {{!-- select2 --}}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-    <!-- clockPicker -->
-    <link rel="stylesheet" type="text/css" href="/clockpicker/dist/jquery-clockpicker.min.css">
-    <link rel="stylesheet" type="text/css" href="/clockpicker/assets/css/github.min.css">
+  <!-- clockPicker -->
+  <link rel="stylesheet" type="text/css" href="/clockpicker/dist/jquery-clockpicker.min.css">
+  <link rel="stylesheet" type="text/css" href="/clockpicker/assets/css/github.min.css">
 
-    <!-- Custom fonts for this template-->
-    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+  <!-- Custom fonts for this template-->
+  <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link
+    href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+    rel="stylesheet">
 
-    <!-- Custom styles for this template-->
-    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+  <!-- Custom styles for this template-->
+  <link href="/css/sb-admin-2.min.css" rel="stylesheet">
 
-    {{!-- end of add on --}}
-    <title>{{title}}</title>
+  {{!-- end of add on --}}
+  <title>{{title}}</title>
 </head>
+
 <body id="page-top">
 
   <!-- Page Wrapper -->
@@ -47,7 +52,9 @@
       <!-- Sidebar - Brand -->
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dashboard">
         <div class="sidebar-brand-icon">
-          <i class=""><img src="https://i2.wp.com/ivankuraswc.com/wp-content/uploads/2018/04/favw.png?zoom=1.25&w=1080&ssl=1" alt="" width="40" height="40"> </i>
+          <i class=""><img
+              src="https://i2.wp.com/ivankuraswc.com/wp-content/uploads/2018/04/favw.png?zoom=1.25&w=1080&ssl=1" alt=""
+              width="40" height="40"> </i>
         </div>
         <div class="sidebar-brand-text mx-3">KAK IVAN</div>
       </a>
@@ -91,7 +98,7 @@
           <i class="fas fa-fw fa-handshake"></i>
           <span>Jasa</span></a>
       </li>
-      
+
       <!-- Nav Item - Charts -->
       <li class="nav-item">
         <a class="nav-link" href="/sopir">
@@ -106,7 +113,7 @@
           <span>Contact</span></a>
       </li>
 
-<!-- Divider -->
+      <!-- Divider -->
       <hr class="sidebar-divider my-0">
       <li class="nav-item">
         <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
@@ -155,7 +162,8 @@
   </a>
 
   <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -175,14 +183,18 @@
 
 
 </body>
+
 </html>
 
 {{!-- javascript add on --}}
 
 {{!-- bootstrap --}}
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+  integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+  integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 {{!-- jquery --}}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 {{!-- data tables --}}
@@ -206,23 +218,23 @@
 {{!-- sweet alert --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script>
-    const setActiveBar = (title = "") => {
-        const elem = $(`a[href="/${title.toLowerCase()}"]`)
-        const result = elem.parent().addClass('active')
+  const setActiveBar = (title = "") => {
+    const elem = $(`a[href="/${title.toLowerCase()}"]`)
+    const result = elem.parent().addClass('active')
+  }
+  $(document).ready(() => {
+    const user = sessionStorage.getItem('user')
+    if (!user) {
+      return window.location.href = '/login'
     }
-    $(document).ready(() => {
-        const user = sessionStorage.getItem('user')
-        if (!user) {
-          return window.location.href = '/login'
-        }
-        // logout
-        $('#logout').click(() => {
-          sessionStorage.removeItem('user')
-          return window.location.href = '/login'
-        })
-        const title = $('title').text()
-        setActiveBar(title)
+    // logout
+    $('#logout').click(() => {
+      sessionStorage.removeItem('user')
+      return window.location.href = '/login'
     })
+    const title = $('title').text()
+    setActiveBar(title)
+  })
 </script>
 
 <!-- Core plugin JavaScript-->
@@ -234,7 +246,8 @@
 <!-- Page level plugins -->
 <script src="/vendor/chart.js/Chart.min.js"></script>
 
-{{!-- <!-- Page level custom scripts -->
+{{!--
+<!-- Page level custom scripts -->
 <script src="/js/demo/chart-area-demo.js"></script>
 <script src="/js/demo/chart-pie-demo.js"></script> --}}
 
