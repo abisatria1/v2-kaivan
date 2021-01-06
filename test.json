@@ -1,0 +1,111 @@
+{
+  "resourceName": "people/c2305881726575640817",
+  "etag": "%EgwBAj0DBQs/DBBANy4aBAECBQciDHBLL1RrVUdnMWxnPQ==",
+  "metadata": {
+    "sources": [
+      {
+        "type": "CONTACT",
+        "id": "20002336969b00f1",
+        "etag": "#pK/TkUGg1lg=",
+        "updateTime": "2021-01-06T14:02:46.220Z"
+      }
+    ],
+    "objectType": "PERSON"
+  },
+  "names": [
+    {
+      "metadata": {
+        "primary": true,
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "displayName": "Testing Kontak",
+      "givenName": "Testing Kontak",
+      "displayNameLastFirst": "Testing Kontak",
+      "unstructuredName": "Testing Kontak"
+    }
+  ],
+  "photos": [
+    {
+      "metadata": {
+        "primary": true,
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "url": "https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/V8BNOaftJmYIgEx33vL5fJBV0yakLtoiQCLcDEAEiGQoBVBD___________8BGPqAsf_______wE/s100/photo.jpg",
+      "default": true
+    }
+  ],
+  "addresses": [
+    {
+      "metadata": {
+        "primary": true,
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "formattedValue": "Jalan Perumahan Taman Lembusora",
+      "type": "home",
+      "formattedType": "Home",
+      "streetAddress": "Jalan Perumahan Taman Lembusora"
+    }
+  ],
+  "phoneNumbers": [
+    {
+      "metadata": {
+        "primary": true,
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "value": "+62 821 46432555",
+      "canonicalForm": "+6282146432555",
+      "type": "other",
+      "formattedType": "Other"
+    },
+    {
+      "metadata": {
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "value": "0851 040444911",
+      "canonicalForm": "+62851040444911",
+      "type": "mobile",
+      "formattedType": "Mobile"
+    },
+    {
+      "metadata": {
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "value": "0854 316914974",
+      "canonicalForm": "+62854316914974",
+      "type": "home",
+      "formattedType": "Home"
+    }
+  ],
+  "memberships": [
+    {
+      "metadata": {
+        "source": {
+          "type": "CONTACT",
+          "id": "20002336969b00f1"
+        }
+      },
+      "contactGroupMembership": {
+        "contactGroupId": "myContacts",
+        "contactGroupResourceName": "contactGroups/myContacts"
+      }
+    }
+  ]
+}
