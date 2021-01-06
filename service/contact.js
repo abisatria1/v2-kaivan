@@ -43,7 +43,7 @@ const getSpesificContact = async (contactId) => {
 
 const updateContact = async (prevContact, newContactRequest) => {
   // update google contact
-  const prev = ({ googleId, etag } = prevContact)
+  const prev = JSON.parse(prevContact.raw)
   const updateGoogle = await updateGoogleContact(prev, newContactRequest)
 
   await prevContact.update({

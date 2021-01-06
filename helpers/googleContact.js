@@ -39,25 +39,22 @@ const getContact = async ({
 }
 
 const createGoogleContact = async (
-  contact = { notelp: "", nama: "", alamat: "", namaKantor: "" },
+  { notelp = "", nama = "", alamat = "", namaKantor = "" } = {},
   service = google.people("v1")
 ) => {
   let contactData = {}
-  if (contact.notelp != "" || contact.notelp || contact.notelp != null) {
-    contactData.phoneNumbers = [{ value: contact.notelp }]
+
+  if (notelp != "" && notelp && notelp != null) {
+    contactData.phoneNumbers = [{ value: notelp }]
   }
-  if (contact.nama != "" || contact.nama || contact.nama != null) {
-    contactData.names = [{ givenName: contact.nama }]
+  if (nama != "" && nama && nama != null) {
+    contactData.names = [{ givenName: nama }]
   }
-  if (contact.alamat != "" || contact.alamat || contact.alamat != null) {
-    contactData.addresses = [{ streetAddress: contact.alamat }]
+  if (alamat != "" && alamat && alamat != null) {
+    contactData.addresses = [{ streetAddress: alamat }]
   }
-  if (
-    contact.namaKantor != "" ||
-    contact.namaKantor ||
-    contact.namaKantor != null
-  ) {
-    contactData.organizations = [{ name: contact.namaKantor }]
+  if (namaKantor != "" && namaKantor && namaKantor != null) {
+    contactData.organizations = [{ name: namaKantor }]
   }
 
   contactData.biographies = [{ value: "Created from kaivan app" }]
@@ -76,29 +73,48 @@ const createGoogleContact = async (
 }
 
 const updateGoogleContact = async (
-  prev = { googleId: "", etag: "" },
-  contact = { nama: "", alamat: "", notelp: "", namaKantor: "" },
+  {
+    resourceName = "",
+    etag = "",
+    names = [],
+    addresses = [],
+    phoneNumbers = [],
+    organizations = [],
+  } = {},
+  { nama = "", alamat = "", notelp = "", namaKantor = "" } = {},
   service = google.people("v1")
 ) => {
-  let contactData = {}
-  contactData.etag = prev.etag
-  if (contact.notelp != "" || contact.notelp || contact.notelp != null) {
-    contactData.phoneNumbers = [{ value: contact.notelp }]
+  console.log({ alamat, addresses })
+  let contactData = {},
+    updatePersonFields = []
+
+  contactData.etag = etag
+  if (notelp != "" && notelp && notelp != null) {
+    phoneNumbers[0] = { value: notelp }
+    updatePersonFields.push("phoneNumbers")
+    contactData.phoneNumbers = phoneNumbers
   }
-  if (contact.nama != "" || contact.nama || contact.nama != null) {
-    contactData.names = [{ givenName: contact.nama }]
+  if (nama != "" && nama && nama != null) {
+    names[0] = { givenName: nama }
+    updatePersonFields.push("names")
+    contactData.names = names
   }
-  if (contact.alamat != "" || contact.alamat || contact.alamat != null) {
-    contactData.addresses = [{ streetAddress: contact.alamat }]
+  if (alamat != "" && alamat && alamat != null) {
+    addresses[0] = { streetAddress: alamat }
+    updatePersonFields.push("addresses")
+    contactData.addresses = addresses
   }
-  if (contact.namaKantor) {
-    contactData.organizations = [{ name: contact.namaKantor }]
+  if (namaKantor && namaKantor != "" && namaKantor != null) {
+    organizations[0] = { name: namaKantor }
+    updatePersonFields.push("organizations")
+    contactData.organizations = organizations
   }
+
   return new Promise(async (resolve, reject) => {
     try {
       const hasil = await service.people.updateContact({
-        resourceName: prev.googleId,
-        updatePersonFields: "names,addresses,phoneNumbers,organizations",
+        resourceName,
+        updatePersonFields: updatePersonFields.join(","),
         requestBody: contactData,
       })
       resolve(hasil.data)

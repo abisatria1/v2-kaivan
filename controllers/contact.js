@@ -1,9 +1,4 @@
 const { response, customError } = require("../helpers/wrapper")
-const Op = require("sequelize").Op
-// models
-const Contact = require("../models/Contact")
-const GoogleToken = require("../models/GoogleToken")
-// service
 const contactService = require("../service/contact")
 
 const getAllContactGoogle = async (req, res, next) => {
