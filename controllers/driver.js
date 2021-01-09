@@ -1,5 +1,6 @@
 const { response, customError } = require("../helpers/wrapper")
 const driverService = require("../service/driver")
+const orderService = require("../service/order")
 
 const getAllDriver = async (req, res, next) => {
   const drivers = await driverService.getAllDriver()
@@ -38,10 +39,38 @@ const deleteDriver = async (req, res, next) => {
   response(res, true, delDriver, "Data sopir berhasil di hapus", 200)
 }
 
+const getNotCheckOrder = async (req, res, next) => {
+  const { driverCode } = req.params
+  const { tanggalAwal = "", tanggalAkhir = "" } = req.query
+
+  if (tanggalAwal != "" && isNaN(new Date(tanggalAwal).getTime())) {
+    return next(customError("Invalid date", 400))
+  }
+  if (tanggalAkhir != "" && isNaN(new Date(tanggalAkhir).getTime())) {
+    return next(customError("Invalid date", 400))
+  }
+
+  const driverOrder = await orderService.getNotCheckedOrderByDriver(
+    driverCode,
+    tanggalAwal,
+    tanggalAkhir
+  )
+  return response(res, true, driverOrder, "Berhasil", 200)
+}
+
+const checkOrder = async (req, res, next) => {
+  const { driverCode } = req.params
+  const { orderIds } = req.body
+  const result = await orderService.checkDriverOrder(driverCode, orderIds)
+  return response(res, true, result, "Berhasil", 200)
+}
+
 module.exports = {
   getAllDriver,
   createDriver,
   getSpesificDriver,
   updateDriver,
   deleteDriver,
+  getNotCheckOrder,
+  checkOrder,
 }

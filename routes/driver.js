@@ -18,6 +18,11 @@ router
   )
 
 router
+  .route("/order/:driverCode")
+  .get(driverController.getNotCheckOrder)
+  .post(validateBody(schema.checkOrderSchmea), driverController.checkOrder)
+
+router
   .route("/:driverId")
   .get(driverController.getSpesificDriver)
   .patch(

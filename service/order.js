@@ -200,6 +200,114 @@ const findOrderById = async (orderId = 0) => {
   return await Order.findByPk(orderId)
 }
 
+// Menampilkan order yang blm di cek sesuai dengan kode driver / id
+// tanpa order dengan status proses
+// bisa menggunakan all dan custom tanggal
+const getNotCheckedOrderByDriver = async (
+  driverCode,
+  tanggalAwal,
+  tanggalAkhir
+) => {
+  let tanggalAwalQuery = [],
+    tanggalAkhirQuery = []
+  if (tanggalAwal && tanggalAwal != "") {
+    tanggalAwalQuery = [
+      { tanggalOrder: { [Op.gte]: `${tanggalAwal} 00:00:00` } },
+    ]
+  }
+  if (tanggalAkhir && tanggalAkhir != "") {
+    tanggalAkhirQuery = [
+      { tanggalOrder: { [Op.lte]: `${tanggalAkhir} 23:59:59` } },
+    ]
+  }
+
+  const driverOrder = await Order.findAll({
+    attributes: {
+      exclude: [
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+        "customerId",
+        "paymentId",
+        "partnerId",
+      ],
+    },
+    include: [
+      {
+        model: Customer,
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        include: [
+          {
+            model: Contact,
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "deletedAt", "raw"],
+            },
+          },
+        ],
+      },
+      {
+        model: Partner,
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        include: [
+          {
+            model: Contact,
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "deletedAt", "raw"],
+            },
+          },
+        ],
+      },
+      {
+        model: Driver,
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        through: {
+          attributes: [],
+        },
+        where: { kodeSopir: driverCode },
+      },
+    ],
+    where: {
+      [Op.and]: [
+        ...tanggalAwalQuery,
+        ...tanggalAkhirQuery,
+        { status: { [Op.not]: 1 } }, // proses
+        { isCheck: 0 }, // blm di cek
+      ],
+    },
+    order: [
+      ["tanggalOrder", "asc"],
+      ["jam", "ASC"],
+    ],
+  })
+
+  return driverOrder
+}
+
+// mengubah kondisi order dari belum di cek menjadi sudah di cek
+const checkDriverOrder = async (driverCode, orderIds = []) => {
+  let updated = 0
+  const order = await Order.findAll({
+    include: [
+      {
+        model: Driver,
+        where: { kodeSopir: driverCode },
+      },
+    ],
+    where: {
+      id: { [Op.in]: orderIds },
+    },
+  })
+  for (let i = 0; i < order.length; i++) {
+    const element = order[i]
+    await element.update({ isCheck: 1 })
+    updated++
+  }
+  return {
+    requestToUpdate: orderIds.length,
+    updated,
+  }
+}
+
 module.exports = {
   getAllOrderByDate,
   addOrder,
@@ -207,4 +315,6 @@ module.exports = {
   deleteOrder,
   getDetailOrder,
   findOrderById,
+  getNotCheckedOrderByDriver,
+  checkDriverOrder,
 }

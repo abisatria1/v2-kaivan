@@ -26,7 +26,12 @@ const updateDriverSchema = Joi.object().keys({
   }).required(),
 })
 
+const checkOrderSchmea = Joi.object().keys({
+  orderIds: Joi.array().items(Joi.number()).required(),
+})
+
 module.exports = {
   createDriverSchema,
   updateDriverSchema,
+  checkOrderSchmea,
 }
