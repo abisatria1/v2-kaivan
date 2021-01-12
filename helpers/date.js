@@ -1,6 +1,8 @@
 const Op = require("sequelize").Op
 
 const dateBeetweenQuery = (tanggalAwal = "", tanggalAkhir = "") => {
+  let tanggalAwalQuery = [],
+    tanggalAkhirQuery = []
   // creating query where
   if (tanggalAwal && tanggalAwal != "") {
     tanggalAwalQuery = [

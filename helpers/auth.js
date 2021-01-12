@@ -25,6 +25,9 @@ const googlePassport = new GoogleStrategy(
       logger.debug({ accessToken, refreshToken, profile })
       logger.debug("assigning oauth client")
       const secret = await Secret.create({ accessToken, refreshToken })
+
+      // set cache
+      myCache.set("account", [secret], 86400) // 1 day
       done(null, profile)
     } catch (error) {
       done(error, null)

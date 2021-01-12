@@ -25,6 +25,20 @@ const isValidOrderIds = () => {
   }
 }
 
+const checkPartnerCache = () => {
+  return async (req, res, next) => {
+    const partner = myCache.get(`partner`)
+
+    if (partner) {
+      logger.debug("Ambil data dari cache partner")
+      return response(res, true, partner, "Berhasil", 200)
+    }
+    logger.debug("Ambil data dari database partner")
+    return next()
+  }
+}
+
 module.exports = {
   isValidOrderIds,
+  checkPartnerCache,
 }

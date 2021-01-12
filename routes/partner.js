@@ -8,11 +8,13 @@ const schema = require("../schemas/partnerSchema")
 const validator = require("../helpers/validator/partnerValidator")
 // controller
 const partnerController = require("../controllers/partner")
+const { deleteCacheMiddleware } = require("../helpers/cache")
 
 router
   .route("/")
-  .get(partnerController.getAllPartner)
+  .get(validator.checkPartnerCache(), partnerController.getAllPartner)
   .post(
+    deleteCacheMiddleware(),
     validateBody(schema.createPartnerSchema),
     createOrUpdateGoogleContact(),
     partnerController.createPartner
@@ -22,6 +24,7 @@ router
   .route("/order/:partnerId")
   .get(partnerController.getAllNotPayOrder)
   .post(
+    deleteCacheMiddleware(),
     validateBody(schema.payOrderSchema),
     validator.isValidOrderIds(),
     partnerController.payOrder
@@ -31,10 +34,11 @@ router
   .route("/:partnerId")
   .get(partnerController.getSpesificPartner)
   .patch(
+    deleteCacheMiddleware(),
     validateBody(schema.createPartnerSchema),
     createOrUpdateGoogleContact(),
     partnerController.updatePartner
   )
-  .delete(partnerController.deletePartner)
+  .delete(deleteCacheMiddleware(), partnerController.deletePartner)
 
 module.exports = router

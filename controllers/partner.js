@@ -4,6 +4,7 @@ const orderService = require("../service/order")
 
 const getAllPartner = async (req, res, next) => {
   const partner = await partnerService.getAllPartner()
+  myCache.set("partner", partner)
   return response(res, true, partner, "Data jasa berhasil didapatkan", 200)
 }
 

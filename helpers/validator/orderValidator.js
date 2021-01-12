@@ -20,6 +20,21 @@ const setCustomer = () => {
   }
 }
 
+const checkOrderCache = () => {
+  return async (req, res, next) => {
+    const { tanggalAwal = "", tanggalAkhir = tanggalAwal } = req.query
+    const order = myCache.get(`order_${tanggalAwal}_${tanggalAkhir}`)
+
+    if (order) {
+      logger.debug("Ambil data dari cache order")
+      return response(res, true, order, "Berhasil", 200)
+    }
+    logger.debug("Ambil data dari database order")
+    return next()
+  }
+}
+
 module.exports = {
   setCustomer,
+  checkOrderCache,
 }

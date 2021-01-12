@@ -6,7 +6,13 @@ const { response } = require("./wrapper")
 const setGoogleClient = () => {
   return async (req, res, next) => {
     logger.debug("Setting google client")
-    let secret = await Secret.findAll({})
+    let secret = myCache.get("account")
+    if (!secret) {
+      secret = await Secret.findAll({})
+      myCache.set("account", secret, 86400)
+      logger.debug("using database secret")
+    }
+
     if (!secret.length)
       return response(
         res,

@@ -4,7 +4,6 @@ const bodyParser = require("body-parser")
 const dotenv = require("dotenv").config()
 const path = require("path")
 const hbs = require("express-handlebars")
-const loggerConf = require("./config/logger")
 const { setGoogleClient } = require("./helpers/googleClient")
 const { google } = require("googleapis")
 
@@ -18,6 +17,9 @@ const relation = require("./config/relation")
 const Secret = require("./models/Secret")
 // service
 const contactService = require("./service/contact")
+// global
+const cacheConf = require("./config/cache")
+const loggerConf = require("./config/logger")
 
 app.engine(
   "hbs",
@@ -36,6 +38,11 @@ app.use(express.static(path.join(__dirname, "/public")))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
+
+app.use((req, res, next) => {
+  logger.debug(myCache.keys())
+  next()
+})
 
 cron.schedule("*/2 * * * *", async () => {
   logger.debug("Setting google client")
@@ -63,18 +70,18 @@ cron.schedule("*/2 * * * *", async () => {
 })
 
 // router
-const customerRouter = require("./routes/customer")
 const driverRouter = require("./routes/driver")
 const partnerRouter = require("./routes/partner")
 const orderRouter = require("./routes/order")
 const viewsRouter = require("./routes/views")
 const contactRouter = require("./routes/contact")
+const accountRouter = require("./routes/account")
 app.use(viewsRouter)
-app.use("/api/customer", customerRouter)
 app.use("/api/contact", setGoogleClient(), contactRouter)
 app.use("/api/driver", setGoogleClient(), driverRouter)
 app.use("/api/partner", setGoogleClient(), partnerRouter)
 app.use("/api/order", setGoogleClient(), orderRouter)
+app.use("/api/account", accountRouter)
 
 app.use("/unauthorized", (req, res, next) => {
   let err = new Error("Unauthorized access")

@@ -4,6 +4,7 @@ const orderService = require("../service/order")
 
 const getAllDriver = async (req, res, next) => {
   const drivers = await driverService.getAllDriver()
+  myCache.set("driver", drivers)
   response(res, true, drivers, "Data sopir berhasil didapatkan", 200)
 }
 
