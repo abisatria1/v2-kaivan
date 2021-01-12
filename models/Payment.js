@@ -8,6 +8,10 @@ const Payment = db.define(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    jumlahOrder: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
   },
   {
     paranoid: true,

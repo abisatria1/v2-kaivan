@@ -30,7 +30,12 @@ const updatePartnerSchema = Joi.object().keys({
   }).required(),
 })
 
+const payOrderSchema = Joi.object().keys({
+  orderIds: Joi.array().items(Joi.number()).required(),
+})
+
 module.exports = {
   createPartnerSchema,
   updatePartnerSchema,
+  payOrderSchema,
 }

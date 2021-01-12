@@ -1,4 +1,5 @@
 const Op = require("sequelize").Op
+const db = require("../config/database")
 // models
 const Order = require("../models/Order")
 const Customer = require("../models/Customer")
@@ -6,8 +7,14 @@ const Driver = require("../models/Driver")
 const Partner = require("../models/Partner")
 const Payment = require("../models/Payment")
 const Contact = require("../models/Contact")
+// helper
+const { dateBeetweenQuery } = require("../helpers/date")
 
 const getAllOrderByDate = async (tanggalAwal, tanggalAkhir) => {
+  const { tanggalAwalQuery, tanggalAkhirQuery } = dateBeetweenQuery(
+    tanggalAwal,
+    tanggalAkhir
+  )
   const order = await Order.findAll({
     attributes: {
       exclude: [
@@ -66,10 +73,7 @@ const getAllOrderByDate = async (tanggalAwal, tanggalAkhir) => {
       },
     ],
     where: {
-      [Op.and]: [
-        { tanggalOrder: { [Op.gte]: `${tanggalAwal} 00:00:00` } },
-        { tanggalOrder: { [Op.lte]: `${tanggalAkhir} 23:59:59` } },
-      ],
+      [Op.and]: [...tanggalAwalQuery, ...tanggalAkhirQuery],
     },
     order: [
       ["status", "ASC"],
@@ -201,25 +205,17 @@ const findOrderById = async (orderId = 0) => {
 }
 
 // Menampilkan order yang blm di cek sesuai dengan kode driver / id
-// tanpa order dengan status proses
+// tanpa order dengan status = "proses"
 // bisa menggunakan all dan custom tanggal
 const getNotCheckedOrderByDriver = async (
   driverCode,
   tanggalAwal,
   tanggalAkhir
 ) => {
-  let tanggalAwalQuery = [],
-    tanggalAkhirQuery = []
-  if (tanggalAwal && tanggalAwal != "") {
-    tanggalAwalQuery = [
-      { tanggalOrder: { [Op.gte]: `${tanggalAwal} 00:00:00` } },
-    ]
-  }
-  if (tanggalAkhir && tanggalAkhir != "") {
-    tanggalAkhirQuery = [
-      { tanggalOrder: { [Op.lte]: `${tanggalAkhir} 23:59:59` } },
-    ]
-  }
+  const { tanggalAwalQuery, tanggalAkhirQuery } = dateBeetweenQuery(
+    tanggalAwal,
+    tanggalAkhir
+  )
 
   const driverOrder = await Order.findAll({
     attributes: {
@@ -308,6 +304,145 @@ const checkDriverOrder = async (driverCode, orderIds = []) => {
   }
 }
 
+// Menampilkan order yang blm di bayar sesuai dengan kode partnerid
+// tanpa order dengan status = "proses"
+// bisa menggunakan all dan custom tanggal
+const getNotPayPartnerOrder = async (partnerId, tanggalAwal, tanggalAkhir) => {
+  const { tanggalAwalQuery, tanggalAkhirQuery } = dateBeetweenQuery(
+    tanggalAwal,
+    tanggalAkhir
+  )
+
+  const order = await Order.findAll({
+    attributes: {
+      exclude: ["createdAt", "updatedAt", "deletedAt", "customerId"],
+    },
+    include: [
+      {
+        model: Customer,
+        attributes: {
+          exclude: ["contactGoogleId", "createdAt", "updatedAt", "deletedAt"],
+        },
+        include: [
+          {
+            model: Contact,
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "deletedAt", "raw"],
+            },
+          },
+        ],
+      },
+      {
+        model: Driver,
+        attributes: {
+          exclude: ["contactGoogleId", "createdAt", "updatedAt", "deletedAt"],
+        },
+        through: {
+          attributes: [],
+        },
+        include: [
+          {
+            model: Contact,
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "deletedAt", "raw"],
+            },
+          },
+        ],
+      },
+    ],
+    where: {
+      [Op.and]: [
+        ...tanggalAwalQuery,
+        ...tanggalAkhirQuery,
+        { isPay: 0 },
+        { partnerId },
+        { status: { [Op.not]: 1 } }, // status = proses
+      ],
+    },
+    order: [
+      ["tanggalOrder", "asc"],
+      ["jam", "ASC"],
+    ],
+  })
+
+  return order
+}
+
+// mengecek order apakah id jasa sesuai dan isPay=0
+const getPartnerNotPayOrderByOrderIds = async ({
+  orderIds = [],
+  partnerId = 0,
+  tanggalAwal = "",
+  tanggalAkhir = "",
+}) => {
+  const { tanggalAwalQuery, tanggalAkhirQuery } = dateBeetweenQuery(
+    tanggalAwal,
+    tanggalAkhir
+  )
+  const order = await Order.findAll({
+    where: {
+      [Op.and]: [
+        { id: { [Op.in]: orderIds } },
+        { isPay: 0 },
+        { partnerId: partnerId },
+        ...tanggalAwalQuery,
+        ...tanggalAkhirQuery,
+      ],
+    },
+  })
+
+  return order
+}
+
+const payingPartnerOrder = async ({
+  order = [],
+  orderIds = [],
+  partnerId = 0,
+  tanggalAwal = "",
+  tanggalAkhir = "",
+}) => {
+  let totalOrder = 0,
+    totalBayar = 0
+
+  const { tanggalAwalQuery, tanggalAkhirQuery } = dateBeetweenQuery(
+    tanggalAwal,
+    tanggalAkhir
+  )
+
+  // hitung total order dan komisi
+  order.forEach((item) => {
+    let bayar = 0
+    if (item.harga > 500000) bayar = 100000
+    else bayar = item.harga * 0.2
+    totalOrder++
+    totalBayar += bayar * item.jumlah
+  })
+
+  const payment = await Payment.create({
+    jumlahBayar: totalBayar,
+    jumlahOrder: totalOrder,
+    partnerId,
+  })
+
+  const update = await Order.update(
+    {
+      isPay: 1,
+      paymentId: payment.id,
+    },
+    {
+      where: {
+        [Op.and]: [
+          { id: { [Op.in]: orderIds } },
+          { isPay: 0 },
+          ...tanggalAwalQuery,
+          ...tanggalAkhirQuery,
+        ],
+      },
+    }
+  )
+  return update
+}
+
 module.exports = {
   getAllOrderByDate,
   addOrder,
@@ -317,4 +452,7 @@ module.exports = {
   findOrderById,
   getNotCheckedOrderByDriver,
   checkDriverOrder,
+  getNotPayPartnerOrder,
+  getPartnerNotPayOrderByOrderIds,
+  payingPartnerOrder,
 }
