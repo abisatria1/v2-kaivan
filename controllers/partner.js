@@ -50,7 +50,10 @@ const getAllNotPayOrder = async (req, res, next) => {
     tanggalAwal,
     tanggalAkhir
   )
-
+  myCache.set(
+    `not_pay_order_${partnerId}_${tanggalAwal}_${tanggalAkhir}`,
+    result
+  )
   return response(res, true, result, "Berhasil", 200)
 }
 

@@ -38,7 +38,25 @@ const checkPartnerCache = () => {
   }
 }
 
+const checkNotPayPartnerOrderCache = () => {
+  return async (req, res, next) => {
+    const { partnerId } = req.params
+    const { tanggalAwal = "", tanggalAkhir = "" } = req.query
+
+    const partnerOrder = myCache.get(
+      `not_pay_order_${partnerId}_${tanggalAwal}_${tanggalAkhir}`
+    )
+    if (partnerOrder) {
+      logger.debug("Ambil data dari not pay order cache")
+      return response(res, true, partnerOrder, "Berhasil", 200)
+    }
+    logger.debug("Ambil data dari database not pay order")
+    return next()
+  }
+}
+
 module.exports = {
   isValidOrderIds,
   checkPartnerCache,
+  checkNotPayPartnerOrderCache,
 }

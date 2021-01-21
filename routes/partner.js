@@ -22,7 +22,10 @@ router
 
 router
   .route("/order/:partnerId")
-  .get(partnerController.getAllNotPayOrder)
+  .get(
+    validator.checkNotPayPartnerOrderCache(),
+    partnerController.getAllNotPayOrder
+  )
   .post(
     deleteCacheMiddleware(),
     validateBody(schema.payOrderSchema),

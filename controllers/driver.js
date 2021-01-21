@@ -56,6 +56,10 @@ const getNotCheckOrder = async (req, res, next) => {
     tanggalAwal,
     tanggalAkhir
   )
+  myCache.set(
+    `not_check_order_${driverCode}_${tanggalAwal}_${tanggalAkhir}`,
+    driverOrder
+  )
   return response(res, true, driverOrder, "Berhasil", 200)
 }
 
