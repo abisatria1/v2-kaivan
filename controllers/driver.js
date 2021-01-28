@@ -40,9 +40,10 @@ const deleteDriver = async (req, res, next) => {
   response(res, true, delDriver, "Data sopir berhasil di hapus", 200)
 }
 
-const getNotCheckOrder = async (req, res, next) => {
+const getDriverOrder = async (req, res, next) => {
+  const allowedOrderType = ["belum", "sudah", "semua"]
   const { driverCode } = req.params
-  const { tanggalAwal = "", tanggalAkhir = "" } = req.query
+  const { tanggalAwal = "", tanggalAkhir = "", tipeOrder = "" } = req.query
 
   if (tanggalAwal != "" && isNaN(new Date(tanggalAwal).getTime())) {
     return next(customError("Invalid date", 400))
@@ -50,14 +51,18 @@ const getNotCheckOrder = async (req, res, next) => {
   if (tanggalAkhir != "" && isNaN(new Date(tanggalAkhir).getTime())) {
     return next(customError("Invalid date", 400))
   }
+  if (!allowedOrderType.includes(tipeOrder)) {
+    return next(customError("Invalid order type", 400))
+  }
 
-  const driverOrder = await orderService.getNotCheckedOrderByDriver(
+  const driverOrder = await orderService.getDriverOrderByOption(
     driverCode,
     tanggalAwal,
-    tanggalAkhir
+    tanggalAkhir,
+    tipeOrder
   )
   myCache.set(
-    `not_check_order_${driverCode}_${tanggalAwal}_${tanggalAkhir}`,
+    `driver_order_${tipeOrder}_${driverCode}_${tanggalAwal}_${tanggalAkhir}`,
     driverOrder
   )
   return response(res, true, driverOrder, "Berhasil", 200)
@@ -82,7 +87,7 @@ module.exports = {
   getSpesificDriver,
   updateDriver,
   deleteDriver,
-  getNotCheckOrder,
+  getDriverOrder,
   checkOrder,
   getSpesificDriverByCode,
 }

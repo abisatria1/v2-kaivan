@@ -21,10 +21,7 @@ router
 
 router
   .route("/order/:driverCode")
-  .get(
-    validator.checkDriverNotCheckOrderCache(),
-    driverController.getNotCheckOrder
-  )
+  .get(validator.checkDriverOrderCache(), driverController.getDriverOrder)
   .post(
     deleteCacheMiddleware(),
     validateBody(schema.checkOrderSchmea),

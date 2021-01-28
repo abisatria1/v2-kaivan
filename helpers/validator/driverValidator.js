@@ -12,13 +12,17 @@ const checkDriverCache = () => {
   }
 }
 
-const checkDriverNotCheckOrderCache = () => {
+const checkDriverOrderCache = () => {
   return async (req, res, next) => {
-    const { tanggalAwal = "", tanggalAkhir = tanggalAwal } = req.query
+    const {
+      tanggalAwal = "",
+      tanggalAkhir = tanggalAwal,
+      tipeOrder = "",
+    } = req.query
     const { driverCode } = req.params
 
     const order = myCache.get(
-      `not_check_order_${driverCode}_${tanggalAwal}_${tanggalAkhir}`
+      `driver_order_${tipeOrder}_${driverCode}_${tanggalAwal}_${tanggalAkhir}`
     )
     if (order) {
       logger.debug("Ambil data dari cache order not check")
@@ -31,5 +35,5 @@ const checkDriverNotCheckOrderCache = () => {
 
 module.exports = {
   checkDriverCache,
-  checkDriverNotCheckOrderCache,
+  checkDriverOrderCache,
 }

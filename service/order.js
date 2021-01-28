@@ -207,15 +207,29 @@ const findOrderById = async (orderId = 0) => {
 // Menampilkan order yang blm di cek sesuai dengan kode driver / id
 // tanpa order dengan status = "proses"
 // bisa menggunakan all dan custom tanggal
-const getNotCheckedOrderByDriver = async (
+// allowed option = belum,sudah,semua dan sudah divalidasi
+const getDriverOrderByOption = async (
   driverCode,
   tanggalAwal,
-  tanggalAkhir
+  tanggalAkhir,
+  tipeOrder
 ) => {
   const { tanggalAwalQuery, tanggalAkhirQuery } = dateBeetweenQuery(
     tanggalAwal,
     tanggalAkhir
   )
+
+  let isCheckQuery = []
+  switch (tipeOrder) {
+    case "belum":
+      isCheckQuery.push({ isCheck: 0 })
+      break
+    case "sudah":
+      isCheckQuery.push({ isCheck: 1 })
+      break
+    default:
+      break
+  }
 
   const driverOrder = await Order.findAll({
     attributes: {
@@ -266,8 +280,8 @@ const getNotCheckedOrderByDriver = async (
       [Op.and]: [
         ...tanggalAwalQuery,
         ...tanggalAkhirQuery,
-        { status: { [Op.not]: 1 } }, // proses
-        { isCheck: 0 }, // blm di cek
+        ...isCheckQuery,
+        { status: { [Op.not]: 1 } }, // proses // blm di cek
       ],
     },
     order: [
@@ -450,7 +464,7 @@ module.exports = {
   deleteOrder,
   getDetailOrder,
   findOrderById,
-  getNotCheckedOrderByDriver,
+  getDriverOrderByOption,
   checkDriverOrder,
   getNotPayPartnerOrder,
   getPartnerNotPayOrderByOrderIds,
