@@ -25,8 +25,8 @@
             aria-controls="profile" aria-selected="true">Profile</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="akun-tab" data-toggle="tab" href="#nav-akun" role="tab" aria-controls="akun"
-            aria-selected="false">Akun</a>
+          <a class="nav-link" id="order-tab" data-toggle="tab" href="#nav-order" role="tab" aria-controls="order"
+            aria-selected="false">Order</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" id="jadwal-tab" data-toggle="tab" href="#nav-jadwal" role="tab" aria-controls="jadwal"
@@ -119,45 +119,53 @@
           </form>
         </div>
 
-        <div class="tab-pane fade" id="nav-akun" role="tabpanel" aria-labelledby="nav-akun-tab">
-          <form action="" id="updateAccountForm">
-            <div class="row">
-              <div class="col-3">
-                <label for="username">Username</label>
+        <div class="tab-pane fade" id="nav-order" role="tabpanel" aria-labelledby="nav-order-tab">
+          <div class="table-responsive-md">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <div class="row justify-content-md-center">
+                  <div class="col-sm">
+                    <select class="form-control" name="tipeOrder" id="tipeOrderOption">
+                      <option value="belum" selected>Belum di cek</option>
+                      <option value="sudah">Sudah di cek</option>
+                      <option value="semua">Semua</option>
+                    </select>
+                    <form class="form-inline ml-2 my-2 my-lg-0" id="formTanggal">
+                      <input class="form-control mr-sm-2" id="tanggal" type="search" placeholder="Tanggal">
+                    </form>
+                    <button class="btn-primary btn ml-2" id="customTanggalBtn">Custom</button>
+                    <button class="btn-danger btn ml-2" id="backTanggalBtn">Back</button>
+                  </div>
+                </div>
               </div>
-              <div class="col">
-                <div class="form-group">
-                  <input type="text" id="username" class="form-control" required>
+              <div class="card-body">
+                <div id="orderTitle">
+                  <h4 class="text-primary font-weight-bold" id="orderTableTitle"></h4>
+                  <h5 class="text-primary" id="orderTableDesc"></h5>
+                </div>
+                <div class="table-responsive">
+                  <table id="orderTable" class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">Tanggal</th>
+                        <th scope="col">Nama</th>
+                        <th scope="col">Notelp</th>
+                        <th scope="col">Alamat</th>
+                        <th scope="col">Jumlah</th>
+                        <th scope="col">Harga</th>
+                        <th scope="col">Jam</th>
+                        <th scope="col">Sopir</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Keterangan</th>
+                        <th scope="col">Button</th>
+                      </tr>
+                    </thead>
+                  </table>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col-3">
-                <label for="emailUser">Email</label>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <input type="email" id="emailUser" class="form-control" required>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-3"></div>
-              <div class="col">
-                <div class="changePass" style="text-align: left;">
-                  <a href="" data-izimodal-open="#passwordModal" class="customBtn btn-light">Ubah Password</a>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="button">
-                  <p style="display: inline; margin-right: 12px;">Update email dan username</p>
-                  <button type="submit" class="customBtn successBtn" data-id="1">Update Akun</button>
-                </div>
-              </div>
-            </div>
-          </form>
+          </div>
         </div>
 
         <div class="tab-pane fade" id="nav-jadwal" role="tabpanel" aria-labelledby="nav-jadwal-tab">

@@ -671,55 +671,6 @@ const dateNow = (date) => {
   return `${year}-${month}-${day}`
 }
 
-const formatDateToIndo = (date) => {
-  if (!date) return
-  const tanggal = new Date(date)
-  const year = tanggal.getFullYear()
-  const day = tanggal.getDate()
-  let month = tanggal.getMonth()
-  switch (month) {
-    case 0:
-      month = "Januari"
-      break
-    case 1:
-      month = "Februari"
-      break
-    case 2:
-      month = "Maret"
-      break
-    case 3:
-      month = "April"
-      break
-    case 4:
-      month = "Mei"
-      break
-    case 5:
-      month = "Juni"
-      break
-    case 6:
-      month = "Juli"
-      break
-    case 7:
-      month = "Agustus"
-      break
-    case 8:
-      month = "September"
-      break
-    case 9:
-      month = "Oktober"
-      break
-    case 10:
-      month = "November"
-      break
-    case 11:
-      month = "Desember"
-      break
-    default:
-      break
-  }
-  return `${day} ${month} ${year}`
-}
-
 const updateEventOrder = async (value, elem, orderTable) => {
   const colName = $(elem).data("colName")
   const row = $(elem).parent()

@@ -24,6 +24,30 @@ const updateSopir = async (id, data) => {
       })
       resolve(result.data)
     } catch (err) {
+      reject(err.response)
+    }
+  })
+}
+
+const getAllDriverOrder = async (
+  kodeSopir,
+  tanggalAwal,
+  tanggalAkhir,
+  tipeOrder
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await axios({
+        url: `/api/driver/order/${kodeSopir}`,
+        method: "GET",
+        params: {
+          tanggalAwal,
+          tanggalAkhir,
+          tipeOrder,
+        },
+      })
+      resolve(result.data)
+    } catch (err) {
       console.log(err.response)
       reject(err.response)
     }

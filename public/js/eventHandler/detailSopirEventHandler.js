@@ -13,8 +13,23 @@ let dataSopir = {
       namaKantor: "",
     },
   },
-  prevSopir,
+  prevSopir = {},
+  tanggalAwal = "",
+  tanggalAkhir = "",
+  dateLabel = "",
+  orderOption = $("#tipeOrderOption").val(),
   driverCode = $("#data-kode-sopir").val()
+
+// element
+const elm = {
+  formTanggal: $("#formTanggal"),
+  customDateBtn: $("#customTanggalBtn"),
+  backDateBtn: $("#backTanggalBtn"),
+  datePicker: {},
+  orderTable: {},
+  orderTableTitle: $("#orderTableTitle"),
+  orderTableDesc: $("#orderTableDesc"),
+}
 
 $(document).ready(async () => {
   await setState(driverCode)
@@ -52,5 +67,50 @@ $(document).ready(async () => {
     await doUpdate(dataSopir.id, data)
     $(".loading").addClass("d-none")
     $("#updateBtn").parents(".col").removeClass("d-none")
+  })
+
+  // pindah ke tab order
+  $(document).on(
+    "click",
+    'a[aria-selected="true"]:contains("Order")',
+    async (e) => {
+      changeOrderTableTitle()
+
+      await drawOrderTableByOption(dataSopir.kodeSopir)
+
+      elm.formTanggal.hide()
+      elm.backDateBtn.hide()
+      elm.customDateBtn.show()
+    }
+  )
+
+  // custom btn is click
+  elm.customDateBtn.click((e) => {
+    elm.formTanggal.toggle(500)
+    elm.backDateBtn.toggle(500)
+    elm.customDateBtn.toggle(500)
+    $("#tanggal").click()
+  })
+
+  // back btn is click
+  elm.backDateBtn.click(async (e) => {
+    elm.formTanggal.toggle(500)
+    elm.backDateBtn.toggle(500)
+    elm.customDateBtn.toggle(500)
+  })
+
+  // select tipe order
+  $(document).on("change", "#tipeOrderOption", async (e) => {
+    orderOption = e.target.value
+    changeOrderTableTitle(dateLabel)
+    if (!elm.formTanggal.is(":visible")) {
+      await drawOrderTableByOption(dataSopir.kodeSopir)
+    } else {
+      await drawOrderTableByOption(
+        dataSopir.kodeSopir,
+        tanggalAwal,
+        tanggalAkhir
+      )
+    }
   })
 })
