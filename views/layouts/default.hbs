@@ -218,8 +218,10 @@
 {{!-- sweet alert --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script>
+  const navigation = ['dashboard', 'order', 'jasa', 'sopir', 'contact']
   const setActiveBar = (title = "") => {
-    const elem = $(`a[href="/${title.toLowerCase()}"]`)
+    const navName = navigation.find(nav => title.toLowerCase().includes(nav)) || ""
+    const elem = $(`a[href="/${navName.toLowerCase()}"]`)
     const result = elem.parent().addClass('active')
   }
   $(document).ready(() => {
@@ -257,4 +259,5 @@
 
 {{!-- own handler --}}
 <script src={{systemHandler}}></script>
+<script src={{helper}}></script>
 <script src={{eventHandler}}></script>

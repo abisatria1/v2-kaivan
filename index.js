@@ -28,6 +28,12 @@ app.engine(
     defaultLayout: "default",
     layoutsDir: __dirname + "/views/layouts/",
     partialsDir: __dirname + "/views/partials/",
+    helpers: {
+      toJSON: function (object) {
+        console.log(object)
+        return JSON.stringify(object)
+      },
+    },
   })
 )
 app.set("view engine", "hbs")

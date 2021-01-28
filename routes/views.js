@@ -1,3 +1,5 @@
+const { getDriverByDriverCode } = require("../service/driver")
+
 const router = require("express-promise-router")()
 const dotenv = require("dotenv").config()
 
@@ -36,6 +38,18 @@ router.route("/sopir").get((req, res, next) => {
     pageCss: "/css/sopir.css",
     eventHandler: "/js/eventHandler/sopirEventHandler.js",
     systemHandler: "/js/systemHandler/sopirSystemHandler.js",
+    base_url: process.env.BASE_URL,
+  })
+})
+
+router.route("/sopir/detail/:kodeSopir").get(async (req, res, next) => {
+  res.render("detailSopir", {
+    kodeSopir: req.params.kodeSopir,
+    title: "Detail Sopir",
+    pageCss: "/css/detailSopir.css",
+    eventHandler: "/js/eventHandler/detailSopirEventHandler.js",
+    systemHandler: "/js/systemHandler/detailSopirSystemHandler.js",
+    helper: "/js/helper/detailSopirHelper.js",
     base_url: process.env.BASE_URL,
   })
 })

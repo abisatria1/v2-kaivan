@@ -245,12 +245,6 @@ const defineDataTable = () => {
       { data: "contact.alamat" },
       { data: "kodeSopir" },
       { data: "keterangan" },
-      {
-        defaultContent: `
-                <button class="btn btn-danger deleteBtn"><img src="/images/trash.svg" alt="delete"></button>
-                <button class="btn btn-info viewBtn"><img src="/images/eye.svg" alt="delete"></button>
-                `,
-      },
     ],
     columnDefs: [
       {
@@ -276,6 +270,18 @@ const defineDataTable = () => {
               break
           }
           $(td).addClass("editable")
+        },
+      },
+      {
+        data: "kodeSopir",
+        targets: 6,
+        render: function (kodeSopir, type, row, meta) {
+          return `
+          <button class="btn btn-danger deleteBtn"><img src="/images/trash.svg" alt="delete"></button>
+          <a href="/sopir/detail/${kodeSopir}">
+            <button class="btn btn-info viewBtn"><img src="/images/eye.svg" alt="delete"></button>
+          </a>
+          `
         },
       },
     ],

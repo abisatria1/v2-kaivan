@@ -1,0 +1,173 @@
+{{>sopirNavbar}}
+<input type="hidden" id="data-kode-sopir" value={{kodeSopir}}>
+<!-- awal card -->
+<div class="container-fluid body mt-4 p-4">
+  <div class="card text-center shadow mb-4">
+    <div class="card-header">
+      <div class="row">
+        <div class="col-sm-3">
+          <div class="img">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/1200px-Circle-icons-profile.svg.png"
+              alt="profile.jpg">
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="desc" id="header-info-data">
+            <div class="pageTitle"></div>
+            <h6 class="m-0 font-weight-bold text-primary titleDesc"></h6>
+          </div>
+        </div>
+      </div>
+      <ul class="nav nav-tabs card-header-tabs justify-content-center">
+        <li class="nav-item">
+          <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#nav-profile" role="tab"
+            aria-controls="profile" aria-selected="true">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="akun-tab" data-toggle="tab" href="#nav-akun" role="tab" aria-controls="akun"
+            aria-selected="false">Akun</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="jadwal-tab" data-toggle="tab" href="#nav-jadwal" role="tab" aria-controls="jadwal"
+            aria-selected="false">Jadwal</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+      <!-- untuk message -->
+      <div id="message" style="text-align : center;">
+        <p></p>
+      </div>
+      <!-- end of message -->
+      <div class="tab-content" id="nav-tabContent">
+
+        <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <form action="" id="updateProfileForm">
+            <div class="row">
+              <div class="col-2">
+                <label for="idSopir">Id</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="number" id="idSopir" class="form-control update-data-input" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <label for="namaSopir">Nama</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="namaSopir" class="form-control update-data-input" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <label for="notelpSopir">No Telpon</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="notelpSopir" class="form-control update-data-input" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <label for="alamatSopir">Alamat</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="alamatSopir" class="form-control update-data-input">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <label for="kodeSopir">Kode Sopir</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="kodeSopir" class="form-control update-data-input" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-2">
+                <label for="keteranganSopir">Keterangan</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <textarea class="form-control update-data-input" id="keteranganSopir" cols="10" rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="button">
+                  <button type="submit" id="updateBtn" class="customBtn successBtn" data-id="1">Update</button>
+                </div>
+              </div>
+              <div class="col text-center mt-4 loading d-none">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="tab-pane fade" id="nav-akun" role="tabpanel" aria-labelledby="nav-akun-tab">
+          <form action="" id="updateAccountForm">
+            <div class="row">
+              <div class="col-3">
+                <label for="username">Username</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="username" class="form-control" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <label for="emailUser">Email</label>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="email" id="emailUser" class="form-control" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3"></div>
+              <div class="col">
+                <div class="changePass" style="text-align: left;">
+                  <a href="" data-izimodal-open="#passwordModal" class="customBtn btn-light">Ubah Password</a>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="button">
+                  <p style="display: inline; margin-right: 12px;">Update email dan username</p>
+                  <button type="submit" class="customBtn successBtn" data-id="1">Update Akun</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="tab-pane fade" id="nav-jadwal" role="tabpanel" aria-labelledby="nav-jadwal-tab">
+          <div class="schedules">
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- akhir card -->
