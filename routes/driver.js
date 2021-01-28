@@ -32,6 +32,10 @@ router
   )
 
 router
+  .route("/detail/:driverCode")
+  .get(driverController.getSpesificDriverByCode)
+
+router
   .route("/:driverId")
   .get(driverController.getSpesificDriver)
   .patch(

@@ -70,6 +70,12 @@ const checkOrder = async (req, res, next) => {
   return response(res, true, result, "Berhasil", 200)
 }
 
+const getSpesificDriverByCode = async (req, res, next) => {
+  const { driverCode } = req.params
+  const result = await driverService.getDriverByDriverCode(driverCode)
+  return response(res, true, result, "Berhasil", 200)
+}
+
 module.exports = {
   getAllDriver,
   createDriver,
@@ -78,4 +84,5 @@ module.exports = {
   deleteDriver,
   getNotCheckOrder,
   checkOrder,
+  getSpesificDriverByCode,
 }

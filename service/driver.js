@@ -27,6 +27,13 @@ const getSpesificDriver = async (driverId) => {
   })
 }
 
+const getDriverByDriverCode = async (driverCode) => {
+  return await Driver.findOne({
+    where: { kodeSopir: driverCode },
+    include: [Contact],
+  })
+}
+
 const updateDriver = async (prevDriver, newDriver) => {
   return await prevDriver.update(newDriver)
 }
@@ -42,4 +49,5 @@ module.exports = {
   getSpesificDriver,
   updateDriver,
   deleteDriver,
+  getDriverByDriverCode,
 }
