@@ -218,25 +218,50 @@
 {{!-- sweet alert --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script>
+  function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  }
+
+  function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
   const navigation = ['dashboard', 'order', 'jasa', 'sopir', 'contact']
   const setActiveBar = (title = "") => {
     const navName = navigation.find(nav => title.toLowerCase().includes(nav)) || ""
     const elem = $(`a[href="/${navName.toLowerCase()}"]`)
     const result = elem.parent().addClass('active')
   }
+
   $(document).ready(() => {
-    const user = sessionStorage.getItem('user')
+    let user = getCookie('user')
     if (!user) {
       return window.location.href = '/login'
     }
+    user = JSON.parse(user)
     // logout
     $('#logout').click(() => {
-      sessionStorage.removeItem('user')
+      setCookie('user', '', 1)
       return window.location.href = '/login'
     })
     const title = $('title').text()
     setActiveBar(title)
   })
+
+
 </script>
 
 <!-- Core plugin JavaScript-->

@@ -89,14 +89,35 @@
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
   <script>
+    function setCookie(cname, cvalue, exdays) {
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      var expires = "expires=" + d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
     $(document).ready(() => {
-      if (sessionStorage.getItem('user')) {
+      if (getCookie('user')) {
         return window.location.href = '/'
       }
       const user = $('#user').data('user')
       if (user == false && user) return alert('Login gagal, anda tidak diperbolehkan menggunakan akun tersebut')
       if (user && user != 'false') {
-        sessionStorage.setItem('user', user)
+        setCookie('user', JSON.stringify(user), 1)
         window.location.href = '/'
       }
     })
