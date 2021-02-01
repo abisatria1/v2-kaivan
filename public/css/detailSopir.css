@@ -74,6 +74,14 @@ a:hover {
 #tanggal {
   width: 250px;
 }
+
+.dataTables_length {
+  text-align: left;
+}
+
+.isCheckElement i {
+  font-size: 20px;
+}
 /* end of datatable */
 
 /* end of card body */

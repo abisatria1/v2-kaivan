@@ -53,3 +53,18 @@ const getAllDriverOrder = async (
     }
   })
 }
+
+const checkOrder = async (kodeSopir, data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await axios({
+        url: `/api/driver/order/${kodeSopir}`,
+        method: "POST",
+        data: data,
+      })
+      resolve(result.data)
+    } catch (err) {
+      reject(err.response)
+    }
+  })
+}

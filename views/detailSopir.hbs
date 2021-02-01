@@ -21,15 +21,15 @@
       </div>
       <ul class="nav nav-tabs card-header-tabs justify-content-center">
         <li class="nav-item">
-          <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#nav-profile" role="tab"
+          <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab"
             aria-controls="profile" aria-selected="true">Profile</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="order-tab" data-toggle="tab" href="#nav-order" role="tab" aria-controls="order"
+          <a class="nav-link" id="order-tab" data-bs-toggle="tab" href="#nav-order" role="tab" aria-controls="order"
             aria-selected="false">Order</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="jadwal-tab" data-toggle="tab" href="#nav-jadwal" role="tab" aria-controls="jadwal"
+          <a class="nav-link" id="jadwal-tab" data-bs-toggle="tab" href="#nav-jadwal" role="tab" aria-controls="jadwal"
             aria-selected="false">Jadwal</a>
         </li>
       </ul>
@@ -150,7 +150,6 @@
                         <th scope="col">No</th>
                         <th scope="col">Tanggal</th>
                         <th scope="col">Nama</th>
-                        <th scope="col">Notelp</th>
                         <th scope="col">Alamat</th>
                         <th scope="col">Jumlah</th>
                         <th scope="col">Harga</th>
@@ -158,9 +157,24 @@
                         <th scope="col">Sopir</th>
                         <th scope="col">Status</th>
                         <th scope="col">Keterangan</th>
+                        <th scope="col">Dicek</th>
                         <th scope="col">Button</th>
                       </tr>
                     </thead>
+                    <tfoot>
+                      <tr>
+                        <td colspan="11">
+                          <div class="text-right ml-auto">
+                            <button class="btn btn-primary" id="submitCheckOrderBtn">Submit</button>
+                          </div>
+                        </td>
+                        <td>
+                          <input type="checkbox" class="btn-check" id="check_all" autocomplete="off"
+                            data-is-active="false">
+                          <label class="btn btn-outline-success" for="check_all">Semua</label>
+                        </td>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               </div>
