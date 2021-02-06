@@ -273,7 +273,7 @@ const getDriverOrderByOption = async (
         through: {
           attributes: [],
         },
-        where: { kodeSopir: driverCode },
+        where: { kodeSopir: { [Op.in]: [driverCode] } },
       },
     ],
     where: {

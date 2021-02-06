@@ -1,134 +1,158 @@
 /* page title */
 .pageTitle .pageTitleName {
-    font-size: 24px;
-    font-weight: bold;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 /* table */
 
 .mainTable {
-    margin-top: 24px !important;
+  margin-top: 24px !important;
 }
 
-#orderTable{
-    width: 100% !important;
+#orderTable {
+  width: 100% !important;
 }
 
 td {
-    transition: 0.3s;
+  transition: 0.3s;
 }
 
 .successEdit {
-    animation: successColor 1s ease;
+  animation: successColor 1s ease;
 }
 
 .errEdit {
-    animation: errorColor 1s ease;
+  animation: errorColor 1s ease;
 }
 
 .modalWrapper {
-    width: 70%;
-    margin : 24px auto !important;
-    min-height: 400px !important;
+  width: 70%;
+  margin: 24px auto !important;
+  min-height: 400px !important;
 }
 
 button img {
-    color: white;
+  color: white;
 }
 
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
--webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Firefox */
-input[type=number] {
--moz-appearance: textfield;
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
-
 /* search */
-.searchResult { 
-    display: none;
+.searchResult {
+  display: none;
 }
 
 .active {
-    display: block !important;
+  display: block !important;
 }
 .form-group {
-    position: relative;
+  position: relative;
 }
 
 .active .searchItem {
-    box-shadow: 0 -1px 1px 1px rgba(122, 122, 122, 0.301);
-    display: flex;
-    align-items: center;
-    justify-content: left;
-    padding: 12px;
-    cursor: pointer;
+  box-shadow: 0 -1px 1px 1px rgba(122, 122, 122, 0.301);
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 12px;
+  cursor: pointer;
 }
 
-.active .searchItem:hover{
-    background-color: #d4d4d4;
+.active .searchItem:hover {
+  background-color: #d4d4d4;
 }
 
-.active .searchItem .desc h5{
-    font-size: 16px;
-    font-weight: 800;
+.active .searchItem .desc h5 {
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.active .searchItem .desc p{
-    line-height: 15px;
+.active .searchItem .desc p {
+  line-height: 15px;
 }
 
-.searchResult.active{
-    box-shadow: 1px 1px 3px 1px rgba(85, 85, 85, 0.267);
-    background-color: white;
-    position: absolute;
-    overflow: auto;
-    height: 300px;
-    /* max-width: 490; */
-    min-width: 80%;
-    z-index: 99;
-    border-radius: 10px;
+.searchResult.active {
+  box-shadow: 1px 1px 3px 1px rgba(85, 85, 85, 0.267);
+  background-color: white;
+  position: absolute;
+  overflow: auto;
+  height: 300px;
+  /* max-width: 490; */
+  min-width: 80%;
+  z-index: 99;
+  border-radius: 10px;
 }
 
 #modal {
-    max-height: 90vh !important;
+  max-height: 90vh !important;
 }
 
-.select2-selection{
-    padding: 0.3rem 0.75rem !important;
-    border: 1px solid #CED4DA !important;
+.select2-selection {
+  padding: 0.3rem 0.75rem !important;
+  border: 1px solid #ced4da !important;
 }
 
 .orderDate {
-    font-size: 20px !important;
-    /* font-weight: 600; */
+  font-size: 20px !important;
+  cursor: pointer;
+  display: inline-block;
+  height: 100%;
+  padding-top: 5px;
+}
+
+#tanggal {
+  width: 200px;
+  position: absolute;
+  top: 0;
+  opacity: 0;
+  z-index: -1;
+}
+
+#resetIcon {
+  position: absolute;
+  top: 38px;
+  right: -32px;
+  cursor: pointer;
+  color: #dc3545;
+  transition: 0.2s;
+  display: none;
+}
+
+#resetIcon:hover {
+  transform: scale(1.2);
 }
 
 @keyframes successColor {
-    0% {
-        background-color: initial;
-    }
-    50% {
-        background-color: #66db81;
-    }
-    100% {
-        background-color: initial;
-    }
+  0% {
+    background-color: initial;
+  }
+  50% {
+    background-color: #66db81;
+  }
+  100% {
+    background-color: initial;
+  }
 }
 
 @keyframes errorColor {
-    0% {
-        background-color: initial;
-    }
-    50% {
-        background-color: #DC3545;
-    }
-    100% {
-        background-color: initial;
-    } 
+  0% {
+    background-color: initial;
+  }
+  50% {
+    background-color: #dc3545;
+  }
+  100% {
+    background-color: initial;
+  }
 }

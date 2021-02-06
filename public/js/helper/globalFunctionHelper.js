@@ -18,6 +18,17 @@ formatMysqlDateToString = (tanggal) => {
   return date.format("D MMM YY")
 }
 
+const dateNowMysqlFormat = (jsDate) => {
+  let date
+  if (!jsDate) {
+    date = new Date(Date.now())
+  }
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${year}-${month}-${day}`
+}
+
 const formatDateToIndo = (date = "") => {
   if (date == "") return
   const tanggal = new Date(date)

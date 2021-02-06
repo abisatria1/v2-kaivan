@@ -1,42 +1,55 @@
+// state
+let orderData = [],
+  orderDate = "",
+  orderTable = {},
+  newOrderModal = {},
+  createData = {
+    nama: "",
+    notelp: "",
+    alamat: "",
+    namaKantor: "",
+    google: "",
+    order: {
+      tanggalOrder: "",
+      jumlah: 0,
+      harga: 0,
+      jam: "",
+      keterangan: "",
+      status: "",
+    },
+    driverId: -1,
+    partnerId: -1,
+  }
+
+let elm = {
+  orderDateTitle: $(".orderDate"),
+  tanggal: "#tanggal",
+  create: {
+    form: "#createForm",
+    googleId: "#googleId",
+    namaKantor: "#namaKantor",
+    tanggalOrder: "#tanggalOrder",
+    nama: "#nama",
+    notelp: "#notelp",
+    alamat: "#alamat",
+    jumlah: "#jumlah",
+    jam: "#jam",
+    harga: "#harga",
+    sopir: "#sopir",
+    jasa: "#jasa",
+    status: "#status",
+    keterangan: "#keterangan",
+    resetSearchIcon: "#resetIcon",
+  },
+}
+
 $(document).ready(async () => {
-  const modal = $("#modal").iziModal({
-    title: "Tambah Data Order",
-    subtitle: "Diharapkan mengisi data dengan benar dan bertanggung jawab",
-    headerColor: "#4E73DF",
-    closeButton: true,
-    focusInput: false,
-    width: 700,
-    onClosing: () => {
-      $("#createForm .form-control").each((i, elem) => {
-        if ($(elem).attr("id") !== "tanggalOrder") {
-          $(elem).val("")
-        }
-        $("#jasa").val(-1)
-        $("#status").val(1)
-      })
-      $("#createForm").removeClass("was-validated")
-      $("#createForm").data("search", true)
-      $("#sopir").empty()
-    },
-    onOpening: async () => {
-      await isiSopir()
-      // select2
-      $("#sopir").select2({
-        width: "resolve",
-        placeholder: "--Sopir--",
-        allowClear: true,
-      })
-      $(".clockpicker").clockpicker({
-        placement: "top",
-        align: "right",
-        autoclose: true,
-      })
-    },
+  await setState()
+
+  // data binding dari form
+  $(document).on("input change blur", ".form-binding", (e) => {
+    bindFormData()
   })
-  syncContact()
-  const orderTable = defineDataTable()
-  await drawTable(orderTable, dateNow())
-  isiJasa()
 
   // create
   $(document).on("submit", "#createForm", async (e) => {
@@ -50,30 +63,15 @@ $(document).ready(async () => {
         $("#createForm .loading").removeClass("d-none")
 
         // data
-        const data = {
-          nama: $("#nama").val(),
-          notelp: $("#notelp").val(),
-          alamat: $("#alamat").val(),
-          namaKantor: $("#namaKantor").val(),
-          google:
-            $("#googleId").val() == ""
-              ? undefined
-              : { googleId: $("#googleId").val() },
-          order: {
-            tanggalOrder: $("#tanggalOrder").val(),
-            jumlah: $("#jumlah").val(),
-            harga: $("#harga").val(),
-            jam: $("#jam").val(),
-            keterangan: $("#keterangan").val(),
-            status: $("#status").val(),
-          },
-          driverId: $("#sopir").val(),
-          partnerId: $("#jasa").val(),
+        const data = { ...createData }
+        if (data.google != "") {
+          data.google = { googleId: createData.google }
+        } else {
+          data.google = undefined
         }
-
         // sending data
         await addOrder(data)
-        drawTable(orderTable, data.order.tanggalOrder)
+        drawTable(data.order.tanggalOrder)
 
         // reset
         $("#createForm .button").show()
@@ -84,19 +82,11 @@ $(document).ready(async () => {
         $(form).data("search", true)
 
         // callback client
-        popUpMessage({
-          model: Swal,
-          title: "Berhasil",
-          text: "Data Order berhasil ditambahkan",
-        })
+        successMessage("Berhasil", "Data order berhasil dimasukkan")
         syncContact()
       } catch (err) {
-        popUpMessage({
-          model: Swal,
-          title: "Gagal",
-          text: err.data ? err.data.message : err.message,
-          icon: "error",
-        })
+        const message = err.data ? err.data.message : err.message
+        errorMessage("Terjadi Kesalahan", message)
         $("#createForm .button").show()
         $("#createForm .loading").addClass("d-none")
       }
@@ -105,18 +95,20 @@ $(document).ready(async () => {
 
   // searching
   $("body").on("input", ".searchable", (e) => {
-    const nama = $("#nama").val()
-    const alamat = $("#alamat").val()
-    const notelp = $("#notelp").val()
-    const formData = $("#createForm").data("search")
-    if (nama === "" && notelp === "" && alamat === "") {
-      $("#createForm").data("search", true)
-      $("#googleId").val("")
-      $("#namaKantor").val("")
+    const formData = $(elm.create.form).data("search")
+    if (
+      createData.nama === "" &&
+      createData.notelp === "" &&
+      createData.alamat === ""
+    ) {
+      $(elm.create.form).data("search", true)
+      $(elm.create.googleId).val("")
+      $(elm.create.namaKantor).val("")
     }
     if (formData == true) {
       searching(e.target)
     }
+    bindFormData()
   })
 
   $(document).on("click", ".searchItem", (e) => {
@@ -125,20 +117,36 @@ $(document).ready(async () => {
         ? $(e.target)
         : $(e.target).parents(".searchItem")
     chooseSearchItem(searchItem)
+    $(elm.create.resetSearchIcon).fadeIn("fast")
+    bindFormData()
   })
 
   $(document).on("focus", "#createForm input", (e) => {
-    const nama = $("#nama").val()
-    const alamat = $("#alamat").val()
-    const notelp = $("#notelp").val()
     if ($(e.target).attr("class") != ".searchable") {
       $(".searchResult").removeClass("active")
     }
-    if (nama === "" && notelp === "" && alamat === "") {
-      $("#createForm").data("search", true)
-      $("#googleId").val("")
-      $("#namaKantor").val("")
+    if (
+      createData.nama === "" &&
+      createData.notelp === "" &&
+      createData.alamat === ""
+    ) {
+      $(elm.create.form).data("search", true)
+      $(elm.create.googleId).val("")
+      $(elm.create.namaKantor).val("")
     }
+    bindFormData()
+  })
+
+  $(document).on("click", "#resetIcon", (e) => {
+    $(elm.create.form).data("search", true)
+    $(elm.create.nama).val("")
+    $(elm.create.notelp).val("")
+    $(elm.create.alamat).val("")
+    $(elm.create.googleId).val("")
+    $(elm.create.namaKantor).val("")
+    bindFormData()
+    $(elm.create.resetSearchIcon).fadeOut("fast")
+    console.log(createData)
   })
 
   // live editing
@@ -242,6 +250,7 @@ $(document).ready(async () => {
     $(elem).empty()
     $(elem).text(prevValue)
   })
+
   $(document).on("click", "#editSuccessBtn", async (e) => {
     const value = $("#sopirEdit").val()
     const editBtn = $("td .editBtn")
@@ -335,7 +344,7 @@ $(document).ready(async () => {
               text: "Data order berhasil dihapus.",
             })
             const date = $("#tanggal").val()
-            await drawTable(orderTable, date)
+            await drawTable(date)
           } catch (err) {
             popUpMessage({
               model: swalWithBootstrapButtons,
@@ -347,156 +356,9 @@ $(document).ready(async () => {
         }
       })
   })
-
-  // date on input
-  $("#tanggalOrder").daterangepicker({
-    singleDatePicker: true,
-    showDropdowns: true,
-    minYear: 1901,
-    maxYear: parseInt(moment().format("YYYY"), 10),
-    autoApply: true,
-    opens: "center",
-    locale: {
-      format: "YYYY-MM-DD",
-    },
-  })
-
-  // date on window
-  $("#tanggal").daterangepicker(
-    {
-      singleDatePicker: true,
-      showDropdowns: true,
-      minYear: 1901,
-      maxYear: parseInt(moment().format("YYYY"), 10),
-      autoApply: true,
-      opens: "center",
-      locale: {
-        format: "YYYY-MM-DD",
-      },
-    },
-    (start, end, label) => {
-      const tanggalAwal = start.format("YYYY-MM-DD")
-      $(".orderDate").text(formatDateToIndo(tanggalAwal))
-      drawTable(orderTable, tanggalAwal)
-    }
-  )
 })
 
-const defineDataTable = () => {
-  const order = $("#orderTable").DataTable({
-    columns: [
-      { defaultContent: "" },
-      { data: "customer.contact.nama" },
-      { data: "customer.contact.notelp" },
-      { data: "customer.contact.alamat" },
-      { data: "jumlah" },
-      { data: "harga" },
-      { data: "jam" },
-      { data: "drivers[ ].kodeSopir" },
-      { data: "partner", defaultContent: "" },
-      { data: "status" },
-      { data: "keterangan" },
-      {
-        defaultContent: `
-                <button class="btn btn-datatable btn-icon btn-transparent-dark ml-2 deleteBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                </button>
-                `,
-      },
-    ],
-    columnDefs: [
-      {
-        targets: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        createdCell: function (td, cellData, rowData, row, col) {
-          switch (col) {
-            case 1:
-              $(td).data("colName", "nama")
-              break
-            case 2:
-              $(td).data("colName", "notelp")
-              break
-            case 3:
-              $(td).data("colName", "alamat")
-              break
-            case 4:
-              $(td).data("colName", "order.jumlah")
-              break
-            case 5:
-              $(td).data("colName", "order.harga")
-              break
-            case 6:
-              $(td).data("colName", "order.jam")
-              break
-            case 7:
-              $(td).data("colName", "driverId")
-              break
-            case 8:
-              $(td).data("colName", "partnerId")
-              break
-            case 9:
-              $(td).data("colName", "order.status")
-              break
-            case 10:
-              $(td).data("colName", "order.keterangan")
-              break
-            default:
-              break
-          }
-          $(td).addClass("editable")
-        },
-      },
-      {
-        targets: [8],
-        render: (data, type, row) => {
-          if (data == null || !data) return
-          return data ? data.contact.nama : ""
-        },
-      },
-      {
-        targets: [9],
-        render: (data, type, row) => {
-          if (data == "Proses") {
-            return `<span class="badge badge-warning badge-pill">Proses</span>`
-          } else if (data == "Diselesaikan") {
-            return `<span class="badge badge-primary badge-pill">Diselesaikan</span>`
-          } else {
-            return `<span class="badge badge-danger badge-pill">Batal</span>`
-          }
-        },
-      },
-    ],
-    // rowCallback:  (row, data) => {
-    //     console.log(data)
-    //     if (data.status == "Proses") {
-    //         $(row).addClass('table-warning')
-    //     }else if (data.status == "Diselesaikan" ) {
-    //         $(row).addClass('table-primary')
-    //     }else if (data.status == "Batal") {
-    //         $(row).addClass('table-danger')
-    //     }
-    // }
-  })
-  // tambah nomer
-  order
-    .on("order.dt search.dt", function () {
-      order
-        .column(0, { search: "applied", order: "applied" })
-        .nodes()
-        .each(function (cell, i) {
-          cell.innerHTML = i + 1
-        })
-    })
-    .draw()
-  return order
-}
-
-const drawTable = async (table, date = "") => {
-  $(".orderDate").text(formatDateToIndo(date))
-  const order = await loadOrder(date)
-  table.clear()
-  table.rows.add(order.data)
-  table.draw()
-}
+const defineDataTable = (tanggalAwal = "") => {}
 
 const createValidation = () => {
   $(".needs-validation .select2-selection").addClass("is-valid")
@@ -623,54 +485,6 @@ const addAfterEditAnimations = async ({ row, column }, table, type) => {
   }
 }
 
-const isiSopir = async (prevData = [], elem = "#sopir") => {
-  const sopir = await loadSopir()
-  let str = ``
-  if (prevData.length != 0) {
-    $(sopir.data).each((i, elem) => {
-      if (prevData.indexOf(elem.kodeSopir) != -1) {
-        str += `<option selected value="${elem.id}">${elem.kodeSopir}</option>`
-      } else {
-        str += `<option value="${elem.id}">${elem.kodeSopir}</option>`
-      }
-    })
-  } else {
-    $(sopir.data).each((i, elem) => {
-      str += `<option value="${elem.id}">${elem.kodeSopir}</option>`
-    })
-  }
-  $(`${elem}`).append(str)
-}
-
-const isiJasa = async (prevJasa = "", elem = "#jasa") => {
-  const jasa = await loadJasa()
-  let str = ``
-  if (prevJasa !== "" || elem == "#jasaEdit") {
-    str = `<option value="-1"></option>`
-    $(jasa.data).each((i, elem) => {
-      if (elem.contact.nama == prevJasa) {
-        str += `<option selected value="${elem.id}">${elem.contact.nama}</option>`
-      } else {
-        str += `<option value="${elem.id}">${elem.contact.nama}</option>`
-      }
-    })
-  } else {
-    str = `<option selected value="-1">--Jasa--</option>`
-    $(jasa.data).each((i, elem) => {
-      str += `<option value="${elem.id}">${elem.contact.nama}</option>`
-    })
-  }
-  $(`${elem}`).append(str)
-}
-
-const dateNow = (date) => {
-  if (!date) date = new Date(Date.now())
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${year}-${month}-${day}`
-}
-
 const updateEventOrder = async (value, elem, orderTable) => {
   const colName = $(elem).data("colName")
   const row = $(elem).parent()
@@ -715,7 +529,7 @@ const updateEventOrder = async (value, elem, orderTable) => {
 
   try {
     await updateOrder(rowData.id, raw)
-    await drawTable(orderTable, $("#tanggal").val())
+    await drawTable($("#tanggal").val())
     popUpMessage({
       title: "Perubahan berhasil disimpan",
     })

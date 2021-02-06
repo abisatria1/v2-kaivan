@@ -18,6 +18,7 @@ router.route("/order").get((req, res, next) => {
   res.render("order", {
     title: "Order",
     pageCss: `/css/order.css`,
+    helper: "/js/helper/orderHelper.js",
     eventHandler: "/js/eventHandler/orderEventHandler.js",
     systemHandler: "/js/systemHandler/orderSystemHandler.js",
   })
