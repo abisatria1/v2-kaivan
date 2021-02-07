@@ -21,12 +21,10 @@ formatMysqlDateToString = (tanggal) => {
 const dateNowMysqlFormat = (jsDate) => {
   let date
   if (!jsDate) {
-    date = new Date(Date.now())
+    date = moment(Date.now())
+    date = date.format("YYYY-MM-DD")
+    return date
   }
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  return `${year}-${month}-${day}`
 }
 
 const formatDateToIndo = (date = "") => {
