@@ -29,10 +29,10 @@ const dateNowMysqlFormat = (jsDate) => {
 
 const formatDateToIndo = (date = "") => {
   if (date == "") return
-  const tanggal = new Date(date)
-  const year = tanggal.getFullYear()
-  const day = tanggal.getDate()
-  const month = monthInIndonesia[tanggal.getMonth()]
+  date = moment(date)
+  const day = date.get("date")
+  const year = date.get("year")
+  const month = monthInIndonesia[date.get("month")]
   return `${day} ${month} ${year}`
 }
 
