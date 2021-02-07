@@ -14,14 +14,14 @@ const monthInIndonesia = [
 ]
 // from 2021-01-31 to 31 Januari 2021
 formatMysqlDateToString = (tanggal) => {
-  const date = moment(tanggal)
+  const date = moment(tanggal, "YYYY-MM-DD")
   return date.format("D MMM YY")
 }
 
 const dateNowMysqlFormat = (jsDate) => {
   let date
   if (!jsDate) {
-    date = moment(Date.now())
+    date = moment()
     date = date.format("YYYY-MM-DD")
     return date
   }
@@ -29,7 +29,7 @@ const dateNowMysqlFormat = (jsDate) => {
 
 const formatDateToIndo = (date = "") => {
   if (date == "") return
-  date = moment(date)
+  date = moment(date, "YYYY-MM-DD")
   const day = date.get("date")
   const year = date.get("year")
   const month = monthInIndonesia[date.get("month")]
