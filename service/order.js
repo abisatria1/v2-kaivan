@@ -231,7 +231,7 @@ const getDriverOrderByOption = async (
       break
   }
 
-  const driverOrder = await Order.findAll({
+  let driverOrder = await Order.findAll({
     attributes: {
       exclude: [
         "createdAt",
@@ -273,7 +273,6 @@ const getDriverOrderByOption = async (
         through: {
           attributes: [],
         },
-        where: { kodeSopir: { [Op.in]: [driverCode] } },
       },
     ],
     where: {
@@ -290,7 +289,14 @@ const getDriverOrderByOption = async (
     ],
   })
 
-  return driverOrder
+  const filteredArr = driverOrder.filter((item) => {
+    const hasilCari = item.drivers.find(
+      (driver) => driver.kodeSopir == driverCode
+    )
+    return hasilCari != undefined
+  })
+
+  return filteredArr
 }
 
 // mengubah kondisi order dari belum di cek menjadi sudah di cek

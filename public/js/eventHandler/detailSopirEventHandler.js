@@ -116,6 +116,11 @@ $(document).ready(async () => {
         tanggalAkhir
       )
     }
+    orderCheckedIds = []
+    elm.checkAllBtn.data("is-active", false)
+    elm.checkAllBtn.prop("checked", false)
+    showingSubmitBtn()
+    showingCheckAllBtn()
   })
 
   //semua check order di klik
@@ -156,7 +161,6 @@ $(document).ready(async () => {
 
   // page is change datatable
   elm.orderTable.on("page.dt", () => {
-    showingCheckAllBtn()
     const allOrder = $(".checkBtn")
     const allOrderArr = [...allOrder]
     allOrderArr.forEach((item) => {
@@ -167,5 +171,6 @@ $(document).ready(async () => {
     elm.submitCheckOrderBtn.hide()
     elm.checkAllBtn.data("is-active", false)
     elm.checkAllBtn.prop("checked", false)
+    showingCheckAllBtn()
   })
 })

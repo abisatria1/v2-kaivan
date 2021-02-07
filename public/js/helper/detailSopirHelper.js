@@ -118,6 +118,7 @@ const defineDatatables = () => {
         defaultContent: "",
       },
     ],
+    deferLoading: 5,
     columnDefs: [
       {
         targets: [1],
@@ -288,7 +289,8 @@ const showingSubmitBtn = () => {
 }
 
 const showingCheckAllBtn = () => {
-  const allOrderArr = [...$(".checkBtn")]
+  const allOrder = $(".checkBtn")
+  const allOrderArr = [...allOrder]
   if (!allOrderArr.length) {
     elm.checkAllBtn.hide()
   } else {

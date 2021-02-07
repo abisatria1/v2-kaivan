@@ -73,6 +73,7 @@ const successMessage = async (title = "", text = "") => {
   Swal.fire({
     title,
     text,
+    backdrop: false,
     showConfirmButton: false,
     icon: "success",
     timer: 2000,
