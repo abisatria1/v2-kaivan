@@ -146,12 +146,12 @@ $(document).ready(async () => {
     $(elm.create.namaKantor).val("")
     bindFormData()
     $(elm.create.resetSearchIcon).fadeOut("fast")
-    console.log(createData)
   })
 
   // live editing
   // live editing content
   $("#orderTable").on("dblclick", ".editable", async (event) => {
+    if (event.target.nodeName != "TD") return
     if ($("table").data("active") == "driverId") {
       // close that active
       const driverEdit = $("table").find("#sopirEdit")
@@ -301,6 +301,16 @@ $(document).ready(async () => {
     if (value === prevValue) {
       $(textarea).remove()
       return $(elem).text(prevValue)
+    } else {
+      if ($(elem).data("colName") == "notelp") {
+        if (prevValue != "" && value == "") {
+          errorMessage("Data tidak benar", "No telpon tidak boleh kosong")
+          addAfterEditAnimations(orderTable.cell(elem)[0][0], orderTable, false)
+          $(elem).empty()
+          $(elem).removeClass("hasChange")
+          return $(elem).text($(elem).data("prevValue"))
+        }
+      }
     }
 
     await updateEventOrder(value, elem, orderTable)

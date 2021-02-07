@@ -30,7 +30,9 @@ const createContact = async (contactRequestData = {}) => {
     googleId: contact.resourceName,
     etag: contact.etag,
     raw: JSON.stringify(contact),
-    notelp: contact.phoneNumbers[0].canonicalForm,
+    notelp: contact.phoneNumbers
+      ? contact.phoneNumbers[0].canonicalForm
+      : undefined,
   })
 
   return result
@@ -50,7 +52,9 @@ const updateContact = async (prevContact, newContactRequest) => {
     ...newContactRequest,
     etag: updateGoogle.etag,
     raw: JSON.stringify(updateGoogle),
-    notelp: updateGoogle.phoneNumbers[0].canonicalForm,
+    notelp: updateGoogle.phoneNumbers
+      ? updateGoogle.phoneNumbers[0].canonicalForm
+      : undefined,
   })
 
   const result = await getSpesificContact(prevContact.googleId)

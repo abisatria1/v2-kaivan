@@ -2,7 +2,7 @@ const Joi = require("joi")
 
 const addOrderSchema = Joi.object().keys({
   nama: Joi.string().required(),
-  notelp: Joi.string().required().min(6),
+  notelp: Joi.string().min(6).allow(""),
   alamat: Joi.string().allow(""),
   namaKantor: Joi.string().allow(""),
   google: Joi.object({
@@ -23,7 +23,7 @@ const addOrderSchema = Joi.object().keys({
 
 const updateOrderSchema = Joi.object().keys({
   nama: Joi.string().required(),
-  notelp: Joi.string().required().min(6),
+  notelp: Joi.string().min(6).allow(""),
   alamat: Joi.string().allow(""),
   namaKantor: Joi.string().allow(""),
   google: Joi.object({

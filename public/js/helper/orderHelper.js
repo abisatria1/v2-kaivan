@@ -35,6 +35,7 @@ const defineModal = () => {
       $("#createForm").removeClass("was-validated")
       $("#createForm").data("search", true)
       $("#sopir").empty()
+      $(elm.create.resetSearchIcon).hide()
     },
     onOpening: async () => {
       await isiSopir()
