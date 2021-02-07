@@ -112,6 +112,12 @@ $(document).ready(async () => {
     bindFormData()
   })
 
+  $("body").on("blur", ".searchable", async (e) => {
+    const searchResult = $(".searchResult.active")
+    $(searchResult).removeClass("active")
+    searchResult.empty()
+  })
+
   $(document).on("click", ".searchItem", (e) => {
     const searchItem =
       $(e.target).parents(".searchItem").length == 0
