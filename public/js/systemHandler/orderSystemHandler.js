@@ -92,16 +92,17 @@ const deleteOrder = async (id) => {
   })
 }
 
-const searchContact = async (value = "") => {
+const searchContact = async (value = "", cancelToken) => {
   return new Promise(async (resolve, reject) => {
     try {
       const result = await axios({
         url: `/api/contact/search?value=${value}`,
         method: "GET",
+        cancelToken: cancelToken.token,
       })
       resolve(result.data)
     } catch (err) {
-      console.log(err.response)
+      if (err.message == "Operation canceled due to new request.") return
       reject(err.response)
     }
   })

@@ -19,7 +19,8 @@ let orderData = [],
     },
     driverId: -1,
     partnerId: -1,
-  }
+  },
+  cancelToken
 
 let elm = {
   orderDateTitle: $(".orderDate"),
@@ -426,7 +427,13 @@ const searching = async (elem) => {
     searchResult.empty()
     return
   }
-  let result = await searchContact(str)
+
+  //Check if there are any previous pending requests
+  if (typeof cancelToken != typeof undefined) {
+    cancelToken.cancel("Operation canceled due to new request.")
+  }
+  cancelToken = axios.CancelToken.source()
+  let result = await searchContact(str, cancelToken)
   result = result.data
 
   if (result.length !== 0) {

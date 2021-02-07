@@ -78,6 +78,10 @@ const defineOrderTable = (orderData = []) => {
       },
     },
     processing: true,
+    scrollY: 500,
+    scrollCollapse: true,
+    scroller: true,
+    deferLoading: true,
     columns: [
       { defaultContent: "" },
       { data: "customer.contact.nama" },

@@ -118,7 +118,10 @@ const defineDatatables = () => {
         defaultContent: "",
       },
     ],
-    deferLoading: 5,
+    scrollY: 500,
+    scrollCollapse: true,
+    scroller: true,
+    deferLoading: true,
     columnDefs: [
       {
         targets: [1],
