@@ -112,13 +112,7 @@ $(document).ready(async () => {
     bindFormData()
   })
 
-  $("body").on("blur", ".searchable", async (e) => {
-    const searchResult = $(".searchResult.active")
-    $(searchResult).removeClass("active")
-    searchResult.empty()
-  })
-
-  $(document).on("click", ".searchItem", (e) => {
+  $(document).on("mousedown", ".searchItem", (e) => {
     const searchItem =
       $(e.target).parents(".searchItem").length == 0
         ? $(e.target)
@@ -155,6 +149,12 @@ $(document).ready(async () => {
     $(elm.create.resetSearchIcon).fadeOut("fast")
   })
 
+  $("body").on("blur", ".searchable", async (e) => {
+    const searchResult = $(".searchResult.active")
+    $(searchResult).removeClass("active")
+    searchResult.empty()
+  })
+
   // live editing
   // live editing content
   $("#orderTable").on("dblclick", ".editable", async (event) => {
@@ -175,8 +175,16 @@ $(document).ready(async () => {
       $(elem).data("colName") == undefined
         ? $(elem).parents("td").data("colName")
         : $(elem).data("colName")
-    const value =
-      colName == "order.status" ? $(elem).text().trim() : $(elem).text()
+
+    let value
+    if (colName == "order.status") {
+      value = $(elem).text().trim()
+    } else if (colName == "order.harga") {
+      value = fromMoneyToNumber($(elem).text())
+    } else {
+      value = $(elem).text()
+    }
+
     $(elem).data("prevValue", value)
     $(elem).text("")
     let str = "",
@@ -186,11 +194,15 @@ $(document).ready(async () => {
         str = `<input type="number" class="form-control" value="${value}">`
         $(elem).append(str)
         $(elem).find("input").focus()
+        $(elem).find("input").select()
         break
       case "order.harga":
-        str = `<input type="number" style="width : 100px" class="form-control" value="${value}">`
+        str = `<input type="text" oninput="toMoney(this)" style="width : 100px" class="form-control" value="${fromNumberToMoney(
+          value
+        )}">`
         $(elem).append(str)
         $(elem).find("input").focus()
+        $(elem).find("input").select()
         break
       case "order.jam":
         str = `<input type="text" style="width : 80px" class="form-control" id="changeTime" style="background-color : white;" value="${value}" readonly>`
@@ -248,6 +260,7 @@ $(document).ready(async () => {
         break
     }
     $(elem).find("textarea").focus()
+    $(elem).find("textarea").select()
   })
 
   // update sopir
@@ -274,8 +287,9 @@ $(document).ready(async () => {
     const textarea = event.target //textarea
     const elem = $(textarea).parents("td") //cell / td
     $(textarea).attr("disabled", true)
-    const value = $(textarea).val()
+    let value = $(textarea).val()
     const prevValue = $(elem).data("prevValue")
+
     // cek kolom
     if ($(elem).data("colName") == "driverId") return
     else if ($(elem).data("colName") == "partnerId") {
@@ -303,9 +317,11 @@ $(document).ready(async () => {
         }
         return $(elem).append(sts)
       }
+    } else if ($(elem).data("colName") == "order.harga") {
+      value = fromMoneyToNumber(value)
     }
 
-    if (value === prevValue) {
+    if (value == prevValue) {
       $(textarea).remove()
       return $(elem).text(prevValue)
     } else {

@@ -104,6 +104,12 @@ const defineOrderTable = (orderData = []) => {
     ],
     columnDefs: [
       {
+        targets: [5],
+        render: (data, type, row) => {
+          return fromNumberToMoney(data)
+        },
+      },
+      {
         targets: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         createdCell: function (td, cellData, rowData, row, col) {
           switch (col) {
@@ -272,7 +278,7 @@ const bindFormData = () => {
   createData.alamat = $(elm.create.alamat).val()
   createData.order.jumlah = $(elm.create.jumlah).val()
   createData.order.jam = $(elm.create.jam).val()
-  createData.order.harga = $(elm.create.harga).val()
+  createData.order.harga = fromMoneyToNumber($(elm.create.harga).val())
   createData.driverId = $(elm.create.sopir).val()
   createData.partnerId = $(elm.create.jasa).val()
   createData.order.status = $(elm.create.status).val()

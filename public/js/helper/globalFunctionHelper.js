@@ -80,3 +80,22 @@ const successMessage = async (title = "", text = "") => {
     position: "top-end",
   })
 }
+
+const fromNumberToMoney = (number) => {
+  if (number == "") return ""
+  return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ".")
+}
+
+const fromMoneyToNumber = (money) => {
+  if (money == "") return 0
+  const newStr = money.split(".").join("")
+  const num = parseInt(newStr)
+  if (isNaN(num)) return 0
+  else return num
+}
+
+const toMoney = (htmlElement) => {
+  const value = fromMoneyToNumber(htmlElement.value)
+  const money = fromNumberToMoney(value)
+  htmlElement.value = money
+}

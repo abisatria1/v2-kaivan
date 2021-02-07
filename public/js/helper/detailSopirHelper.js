@@ -124,6 +124,12 @@ const defineDatatables = () => {
     deferLoading: true,
     columnDefs: [
       {
+        targets: [5],
+        render: (data, type, row) => {
+          return fromNumberToMoney(data)
+        },
+      },
+      {
         targets: [1],
         render: (data, type, row) => {
           const [date] = data.split("T")
