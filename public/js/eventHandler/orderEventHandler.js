@@ -94,7 +94,7 @@ $(document).ready(async () => {
   })
 
   // searching
-  $("body").on("input", ".searchable", (e) => {
+  $("body").on("input", ".searchable", async (e) => {
     const formData = $(elm.create.form).data("search")
     if (
       createData.nama === "" &&
@@ -106,7 +106,7 @@ $(document).ready(async () => {
       $(elm.create.namaKantor).val("")
     }
     if (formData == true) {
-      searching(e.target)
+      await searching(e.target)
     }
     bindFormData()
   })
