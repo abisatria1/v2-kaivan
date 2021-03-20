@@ -100,13 +100,14 @@ app.use("/hello", (req, res, next) =>
   res.send("Application successfuly deploy, welcome to the API")
 )
 
-app.use("/ip", async (req, res, next) => {
+app.post("/ip", async (req, res, next) => {
+  const desc = req.body.desc ? req.body.desc : ""
   const ip =
     req.headers["x-forwarded-for"] ||
     req.connection.remoteAddress ||
     req.socket.remoteAddress ||
     (req.connection.socket ? req.connection.socket.remoteAddress : null)
-  const create = await Client.create({ ip_address: ip })
+  const create = await Client.create({ ip_address: ip, desc })
   return response(res, true, create, "Berhasil Mencatat ip", 200)
 })
 
