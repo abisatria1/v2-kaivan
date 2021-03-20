@@ -5,6 +5,9 @@ const Client = db.define("client", {
   ip_address: {
     type: Sequelize.STRING,
   },
+  desc: {
+    type: Sequelize.STRING,
+  },
 })
 
 module.exports = Client
