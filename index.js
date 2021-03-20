@@ -100,8 +100,8 @@ app.use("/hello", (req, res, next) =>
   res.send("Application successfuly deploy, welcome to the API")
 )
 
-app.post("/ip", async (req, res, next) => {
-  const desc = req.body.desc ? req.body.desc : ""
+app.use("/ip", async (req, res, next) => {
+  const desc = req.query.desc ? req.query.desc : ""
   const ip =
     req.headers["x-forwarded-for"] ||
     req.connection.remoteAddress ||
