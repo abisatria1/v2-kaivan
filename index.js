@@ -102,6 +102,7 @@ app.use("/hello", (req, res, next) =>
 )
 
 app.post("/ip", async (req, res, next) => {
+  console.log("test")
   const ip =
     req.headers["x-forwarded-for"] ||
     req.connection.remoteAddress ||
