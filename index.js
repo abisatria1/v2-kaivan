@@ -82,6 +82,7 @@ const orderRouter = require("./routes/order")
 const viewsRouter = require("./routes/views")
 const contactRouter = require("./routes/contact")
 const accountRouter = require("./routes/account")
+const Client = require("./models/Client")
 app.use(viewsRouter)
 app.use("/api/contact", setGoogleClient(), contactRouter)
 app.use("/api/driver", setGoogleClient(), driverRouter)
@@ -98,6 +99,12 @@ app.use("/unauthorized", (req, res, next) => {
 app.use("/hello", (req, res, next) =>
   res.send("Application successfuly deploy, welcome to the API")
 )
+
+app.use("/ip", async (req, res, next) => {
+  const ip = req.connection.remoteAddress
+  const create = await Client.create({ ip_address: ip })
+  return response(res, true, create, "Berhasil Mencatat ip", 200)
+})
 
 // error handling
 app.use((req, res, next) => {

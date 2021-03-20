@@ -6,6 +6,7 @@ const Secret = require("../models/Secret")
 const GoogleToken = require("../models/GoogleToken")
 const Order = require("../models/Order")
 const Contact = require("../models/Contact")
+const Client = require("../models/Client")
 
 Customer.belongsTo(Contact)
 Driver.belongsTo(Contact)
