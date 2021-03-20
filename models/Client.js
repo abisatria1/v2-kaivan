@@ -2,7 +2,19 @@ const Sequelize = require("sequelize")
 const db = require("../config/database")
 
 const Client = db.define("client", {
-  ip_address: {
+  ipAddress: {
+    type: Sequelize.STRING,
+  },
+  campaignid: {
+    type: Sequelize.STRING,
+  },
+  adgroupid: {
+    type: Sequelize.STRING,
+  },
+  keyword: {
+    type: Sequelize.STRING,
+  },
+  device: {
     type: Sequelize.STRING,
   },
   desc: {

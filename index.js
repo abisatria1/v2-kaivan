@@ -15,6 +15,7 @@ const cron = require("node-cron")
 const db = require("./config/database")
 const relation = require("./config/relation")
 const Secret = require("./models/Secret")
+const Client = require("./models/Client")
 // service
 const contactService = require("./service/contact")
 // global
@@ -82,7 +83,7 @@ const orderRouter = require("./routes/order")
 const viewsRouter = require("./routes/views")
 const contactRouter = require("./routes/contact")
 const accountRouter = require("./routes/account")
-const Client = require("./models/Client")
+
 app.use(viewsRouter)
 app.use("/api/contact", setGoogleClient(), contactRouter)
 app.use("/api/driver", setGoogleClient(), driverRouter)
@@ -100,14 +101,13 @@ app.use("/hello", (req, res, next) =>
   res.send("Application successfuly deploy, welcome to the API")
 )
 
-app.use("/ip", async (req, res, next) => {
-  const desc = req.query.desc ? req.query.desc : ""
+app.post("/ip", async (req, res, next) => {
   const ip =
     req.headers["x-forwarded-for"] ||
     req.connection.remoteAddress ||
     req.socket.remoteAddress ||
     (req.connection.socket ? req.connection.socket.remoteAddress : null)
-  const create = await Client.create({ ip_address: ip, desc })
+  const create = await Client.create({ ...req.body, ipAddress: ip })
   return response(res, true, create, "Berhasil Mencatat ip", 200)
 })
 
