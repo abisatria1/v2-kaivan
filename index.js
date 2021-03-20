@@ -101,7 +101,11 @@ app.use("/hello", (req, res, next) =>
 )
 
 app.use("/ip", async (req, res, next) => {
-  const ip = req.connection.remoteAddress
+  const ip =
+    req.headers["x-forwarded-for"] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    (req.connection.socket ? req.connection.socket.remoteAddress : null)
   const create = await Client.create({ ip_address: ip })
   return response(res, true, create, "Berhasil Mencatat ip", 200)
 })
