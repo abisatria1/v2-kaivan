@@ -113,6 +113,13 @@
           <span>Contact</span></a>
       </li>
 
+      <!-- Nav Item - Charts -->
+      <li class="nav-item">
+        <a class="nav-link" href="/client">
+          <i class="far fa-fw fa-user"></i>
+          <span>Client</span></a>
+      </li>
+
       <!-- Divider -->
       <hr class="sidebar-divider my-0">
       <li class="nav-item">
@@ -244,7 +251,7 @@
     }
     return "";
   }
-  const navigation = ['dashboard', 'order', 'jasa', 'sopir', 'contact']
+  const navigation = ['dashboard', 'order', 'jasa', 'sopir', 'contact', 'client']
   const setActiveBar = (title = "") => {
     const navName = navigation.find(nav => title.toLowerCase().includes(nav)) || ""
     const elem = $(`a[href="/${navName.toLowerCase()}"]`)

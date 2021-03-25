@@ -1,0 +1,37 @@
+{{>clientNavbar}}
+
+<div class="container-fluid">
+  <div class="p-4 ml-auto mr-auto mt-4">
+    <div class="pageTitle">
+      <div class="pageTitleName">{{title}}</div>
+    </div>
+    <div class="mainTable table-responsive-md">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <input class="form-control mr-sm-2" id="tanggal" type="search" placeholder="Tanggal">
+        </div>
+        <div class="card-body">
+          <h4 class="m-2 font-weight-bold text-primary text-center">Daftar Client Akses website :
+            https://ivankuraswc.com</h4>
+          <div class="mainTable table-responsive">
+            <table id="clientTable" class="table table-bordered table-hover" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 1px;">No</th>
+                  <th scope="col">Ip Address</th>
+                  <th scope="col">Campaign Id</th>
+                  <th scope="col">AdgroupId</th>
+                  <th scope="col">Keyword</th>
+                  <th scope="col">Device</th>
+                  <th scope="col">Desc</th>
+                  <th scope="col">Tanggal</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -55,6 +55,17 @@ router.route("/sopir/detail/:kodeSopir").get(async (req, res, next) => {
   })
 })
 
+router.route("/client").get((req, res, next) => {
+  res.render("client", {
+    title: "Client",
+    pageCss: "/css/client.css",
+    eventHandler: "/js/eventHandler/clientEventHandler.js",
+    systemHandler: "/js/systemHandler/clientSystemHandler.js",
+    helper: "/js/helper/clientHelper.js",
+    base_url: process.env.BASE_URL,
+  })
+})
+
 router.route("/contact").get((req, res, next) => {
   res.render("contact", {
     title: "contact",
